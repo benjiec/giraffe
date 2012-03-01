@@ -494,14 +494,22 @@ window.GiraffeDraw = function () {
 
         // Common properties
 
-        /** Automatically provide the cut site in cutter labels */
+        // Automatically provide the cut site in cutter labels
         thi$.label_name = function () {
+            var label_name = this.name();
+            if (label_name.length > 20) { label_name = label_name.substring(0,20)+"..."; }
+            if (this.type() == ft.enzyme && this.actually_have_cut()) {
+                label_name += " (" + this.cut() + ")";
+            }
+            return label_name;
+        };
+        thi$.label_full_name = function () {
             var label_name = this.name();
             if (this.type() == ft.enzyme && this.actually_have_cut()) {
                 label_name += " (" + this.cut() + ")";
             }
             return label_name;
-        }; // END DrawnFeature::label_name()
+        };
 
         return thi$;
     } // END DrawnFeature()
@@ -1306,6 +1314,7 @@ window.GiraffeDraw = function () {
 
                 // Enzymes show their cut sites in the label
                 var label_name = thi$.label_name();
+                var label_full_name = thi$.label_full_name();
                 var label = this.map.paper.text(xy1.x, xy1.y, label_name);
 
                 if (section > 3) {
@@ -1319,7 +1328,8 @@ window.GiraffeDraw = function () {
 
                 label.attr({"fill": this.color,
                             "font-size": this.map.label_font_size(),
-                            "opacity": 1.0 });
+                            "opacity": 1.0,
+                            "title": label_full_name });
 
                 this.label_set.push(label_line);
                 this.label_set.push(label);
