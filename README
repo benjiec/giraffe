@@ -1,8 +1,8 @@
-Giraffe: tool for detecting popular features in DNA sequence, creating
-maps of those features, and performing sequence analysis.
+Giraffe: tool for a) detecting popular features in DNA sequence, b) creating
+maps of those features, and c) performing sequence analysis.
 
-This software is written and copyrighted by Addgene, and released
-under the MIT License. See LICENSE file.
+This software is written and copyrighted by Addgene, and released under the MIT
+License. See LICENSE file.
 
 The software is mostly divided into two parts: a Django based service that
 detects features within a sequence, and a set of JavaScript widgets that
@@ -11,6 +11,10 @@ visualize the sequence, features, digests, etc.
 You can use the two parts separately. I.e. you can just use the JavaScript
 widget for visualizing and analyzing sequence and features. See HTML files in
 the demo directory.
+
+
+See README file in src/django/giraffe/analyze/static/js on how to use the
+JavaScript plasmid drawing widget.
 
 
 Requirement for Django service:

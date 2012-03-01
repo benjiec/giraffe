@@ -4,91 +4,15 @@
  *              JSON plasmid feature data
  *
  * Copyright 2011 Addgene, Inc
+ * Copyright 2012 Benjie Chen, Ginkgo Bioworks
  *
- * @version 0.1
- * @author  Mikhail Wolfson (wolfsonm@addgene.org)
- * @author  Benjie Chen     (benjie@addgene.org)
+ * @version 0.2
+ * @author  Mikhail Wolfson (wolfsonm@mit.edu)
+ * @author  Benjie Chen     (benjie@alum.mit.edu)
  *
  */
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// Drawing API: caller should call the GiraffeDraw function to get a drawing
-// and parsing object. The caller should use the object's read() method to
-// read in a JSON list of features, then call one of the object's <Foo>Map
-// methods, with a customized set of options.
-//
-// The read() method can be passed as the JSONP argument to the
-// BLAT get API (i.e. API to retrieve array of features of a sequence
-// from the server):
-//
-//    <script src="/headers/js/raphael-min.js"></script>
-//    <script src="/headers/js/scale.raphael.js"></script>
-//    <script src="http://host/api/js/draw.js"></script>
-//    <script> var gd = GiraffeDraw(); </script>
-//    <script src="http://host/blat/8de36469..../default?jsonp=gd.read">
-//    </script>
-//
-// After the feature data is read in, one (or many) plasmid maps can be drawn.
-// Options to the drawing function are passed in via a dictionary argument. For
-// example:
-//
-//    <script>
-//    gd.CircularMap({ "map_dom_id" : "some_id", ... })
-//    </script>
-//
-/// Available options are:
-//
-//  map_dom_id: ID of the DOM element that contains the map. Default
-//  is "giraffe-draw-map"
-//
-//  fade_time: if non-zero, then highlight a feature will cause an
-//  animated fade-in/out effect. Default is 0.
-//
-//  opacity: opacity when features/enzymes is shown. if not 1.0, then
-//  when feature is moused over or clicked on, the opacity will become
-//  1.0. Default is 0.7.
-//
-//  map_width, map_height: default 640, 640.
-//
-//  plasmid_name: if given, show this name together with size of
-//  sequence in the middle of the plasmid. Default is "".
-//
-//  label_offset: how far from the outter feature should we
-//  start drawing labels. Default is "10".
-//
-//  cutters: which kinds of restriction enzymes to show, if any. This
-//  list of integers is interpreted as follows: [1, 2]: show 1- and 2-
-//  cut restriction enzymes. []: show nothing. etc. Default is [1].
-//
-//  feature_click_callback: a callback that gets called when a feature
-//  is clicked on. Argument to this callback is a Feature object.
-//
-//  digest: draw the map like a restriction digest: features are very
-//  transparent and have no labels, and enzymes are drawn like normal.
-//
-//  digest_fade_factor: fade the features by this much (multiplicative, in [0,1.0])
-//  Defaults to 0.5.
-//
-//  draw_tic_mark: true or false.
-//
-//  region_start_offset: for bp tick marks, start at this offset
-//
-//
-// FRAMEWORK
-// GiraffeDraw()
-// |
-// |- basic initialization of list of Features
-// |
-// |- read(JSON)
-// |  feature parsing into "local" features object
-// |
-// |- CircularMap()
-// |  circular feature drawing, which creates clones of the original Feature
-// |  objects with extended properties
-// |
-// `- LinearMap()
-//    linear feature drawing, which makes its own extended clones of objects
+// See README file
 
 // Protect scope, but ensure that GiraffeDraw() is global
 (function () {
@@ -322,6 +246,7 @@ window.GiraffeDraw = function () {
         this.name = function() { return _name; };
         this.start = function() { return _start; };
         this.end = function() { return _end; };
+        this.length = function() { return _end < _start ? _end+seq_length-_start+1 : _end-_start+1; }
         this.type = function() { return _type; };
         this.clockwise = function() { return _clockwise; };
         this.default_show_feature = function() { return _default_show_feature; };
@@ -1474,182 +1399,88 @@ window.GiraffeDraw = function () {
 
         // Move features that overlap to other radii.
         thi$.resolve_conflicts = function () {
-            var conflicts = 0,
+            var unpinned = 0,
                 rad = plasmid_radius, // current radius
                 rx = 1,               // radius counter
                 max_rad = plasmid_radius,
                 fx, f,
-                biggest_size, biggest_feature, furthest_point,
-                new_rad, new_size,
-                eff_furthest_point, overlap;
+                new_rad;
 
-            // Utility functions
-            function push(winner, loser) {
-                var ppfx, pfx, pf,
-                    can_push;
+            // Reset radius of each feature to 0 - this way we know which
+            // feature we have gone through.
+            for (fx = 0; fx < this.features.length; fx++) { this.features[fx].radius = 0; }
+            // Sort by length of feature, so larger features pinned closer to default radius
+            this.features.sort(function (a,b) {return (b.length()-a.length());});
 
-                // Record that the push happened
-                winner.pushed_features.push(loser);
-                conflicts++;
+            unpinned = 1; // Just to get the loop started
+            while (unpinned > 0) {
+                var current_radius_features = [];
 
-                // Do it
-                loser.radius = new_rad;
-
-                if (_debug) {
-                    console.warn(loser.name() +
-                        " (" + loser.real_start() + ", " + loser.real_end() + ")" +
-                        " pushed by " +
-                        winner.name() +
-                        " (" + winner.real_start() + ", " + winner.real_end() + ")");
-                }
-
-                // Since loser was pushed, un-push all the
-                // features that it pushed, as long as
-                // those features are not in conflict with the winner,
-                // or with their own, previously pushed features, which are
-                // now unpushed
-                for (pfx = 0; pfx < loser.pushed_features.length; pfx++) {
-                    pf = loser.pushed_features[pfx];
-
-                    // Check for conflict with the winner feature itself
-                    // If there's no conflict, we can push it back safely.
-                    if (pf.real_start() - winner.real_end() <= min_overlap_cutoff ||
-                        winner.real_start() - pf.real_end() <= min_overlap_cutoff) {
-
-                        // Check for conflict with previously pushed features
-                        // that may have been unpushed
-                        can_push = true;
-                        for (ppfx = 0; ppfx < pf.pushed_features.length; ppfx++) {
-                            if (pf.pushed_features[ppfx].radius == rad) {
-                                can_push = false;
-                                break;
-                            }
+                function conflict(f) {
+                    var i;
+                    var f_start, f_end;
+                    f_start = f.start();
+                    f_end = f.end();
+                    for (i = 0; i < current_radius_features.length; i++) {
+                        var c_start, c_end;
+                        current = current_radius_features[i];
+                        c_start = current.start();
+                        c_end = current.end();
+                        if (_debug) {
+                          console.warn("conflict? "+f.name()+" ("+f_start+"-"+f_end+") against "
+                                                   +current.name()+" ("+c_start+"-"+c_end+")");
                         }
-
-                        // Finally!
-                        if (can_push) {
-                            if (_debug) {
-                                console.warn(pf.name() + " unpushed, because " +
-                                             loser.name() + " pushed by " + winner.name());
-                            }
-                            pf.radius = rad;
+                        if (f_start <= c_end && f_end >= c_start) {
+                          if (_debug) { console.warn("found conflict"); }
+                          return true;
+                        }
+                        else if (   c_end < c_start // c crosses circular boundary
+                                 && f_start <= c_end+seq_length && f_end >= c_start) {
+                          if (_debug) { console.warn("found conflict - c crosses boundary, f near c start"); }
+                          return true;
+                        }
+                        else if (   c_end < c_start // c crosses circular boundary
+                                 && f_start <= c_end && f_end+seq_length >= c_start) {
+                          if (_debug) { console.warn("found conflict - c crosses boundary, f near c end"); }
+                          return true;
+                        }
+                        else if (   c_end < c_start // c crosses circular boundary
+                                 && f_end < f_start // f crosses circular boundary
+                                 && f_start <= c_end+seq_length && f_end+seq_length >= c_start) {
+                          if (_debug) { console.warn("found conflict - f and c cross boundary"); }
+                          return true;
                         }
                     }
+                    return false;
                 }
-            }
 
-            // Main method body
-            // reset radii in case this is being done any time but the first
-            for (fx = 0; fx < this.features.length; fx++) {
-                this.features[fx].radius = plasmid_radius;
-            }
-
-            // Don't try to resolve conflicts too many times
-            var max_tries = 11;
-
-            do {
-                max_tries--;
-
+                if (_debug) { console.warn("resolving conflicts: radius "+rad); }
                 // Keep alternating between inside and outside the plasmid.
                 delta = rx *radius_spacing;
+                if (rx %2 === 0) { new_rad = rad + delta; }
+                else { new_rad = rad - delta; }
 
-                if (rx %2 === 0) { // Even rx
-                    new_rad = rad + delta;
-                } else {
-                    new_rad = rad - delta;
-                }
-
-                conflicts = 0; // Assume you have no conflicts until you find some
-
-                // Clear the record of who pushed whom
+                unpinned = 0;
                 for (fx = 0; fx < this.features.length; fx++) {
-                    this.features[fx].pushed_features = [];
-                }
-
-                biggest_size = 0;
-                biggest_feature = undefined;
-                furthest_point = 0; // Start at a complete lower bound
-
-                // Go through the feature list twice, to make sure that features
-                // that cross the boundary are resolved
-                for (fx = 0; fx < this.features.length; fx++) {
-                    f = this.features[fx % this.features.length];
-
-                    // Stop when we are no longer working with overlapped features
-                    if (fx > this.features.length &&
-                        biggest_feature.start() < biggest_feature.end()) { break; }
-
-                    if (f.visible && f.type() != ft.enzyme && f.radius == rad) {
-
-                        // first one at this radius, so this is the biggest
-                        // feature at the moment
-                        if (biggest_feature === undefined) {
-                            biggest_feature = f;
-                            biggest_size = f.bp_size();
-                            furthest_point = f.end();
-                            if (f.end() < f.start()) { furthest_point+=seq_length; }
-                            continue;
-                        }
-
-                        new_size = f.bp_size();
-                        overlap = furthest_point-f.start();
-
-                        if (overlap <= min_overlap_cutoff) {
-                            // We've cleared all potential conflicts: reset
-                            // the indicators
-                            biggest_size = new_size;
-                            biggest_feature = f;
-                            furthest_point = f.end();
-                            if (f.end() < f.start()) { furthest_point+=seq_length; }
-
-                        // since we go around twice, it is now possible
-                        // for a feature to "conflict with itself," so we
-                        // explicitly prevent this
-                        } else if (biggest_feature &&
-                                   biggest_feature != f &&
-                                   biggest_size > min_overlap_feature_size &&
-                                   new_size > min_overlap_feature_size &&
-                                  (overlap <= 0 ||
-                                  (overlap/biggest_size > min_overlap_pct &&
-                                   overlap/new_size > min_overlap_pct))) {
-                            // Overlap: conflict!
-                            if (new_size > biggest_size) { // This feature is top dog,
-                                                           // move the original to the
-                                                           // new radius
-                                push(f, biggest_feature);
-                                if (_debug) {
-                                    console.warn(fx + ", " + rx + ": overlap=" + overlap);
-                                }
-
-                                // Update the new top dog
-                                biggest_size = new_size;
-                                biggest_feature = f;
-                                furthest_point = f.end();
-                                if (f.end() < f.start()) { furthest_point+=seq_length; }
-
-                            } else { // The original feature is top dog. move the new
-                                     // feature to the new radius
-                                push(biggest_feature, f);
-                            }
-
-                        }
+                    feature = this.features[fx];
+                    if (feature.radius != 0) { continue; } // already done it
+                    if (!conflict(feature)) {
+                      feature.radius = rad; // pin this feature
+                      current_radius_features.push(feature);
+                      if (_debug) { console.warn("pin "+feature.name()); }
                     }
+                    else { unpinned++; }
                 }
 
                 // Keep track of the biggest radius reached
-                if (rad > max_rad) {
-                    max_rad = rad;
-                }
+                if (rad > max_rad) { max_rad = rad; }
 
                 // Move on to the next radius
                 rad = new_rad;
                 rx++;
-
-            } while (conflicts > 0 && max_tries > 0); // Keep adding levels of resolution
+            }
 
             return max_rad;
-
-
         };
 
         // Global label list: keeps track of which label should be in each
