@@ -1,6 +1,8 @@
 Giraffe: tool for a) detecting popular features in DNA sequence, b) creating
 maps of those features, and c) performing sequence analysis.
 
+Example: http://addgene.org:8800/
+
 This software was written and copyrighted by Addgene, and released under the
 MIT License. See LICENSE file. It is now maintained by Benjie Chen.
 
@@ -8,14 +10,16 @@ The software is mostly divided into two parts: a Django based service that
 detects features within a sequence, and a set of JavaScript widgets that
 visualize the sequence, features, digests, etc.
 
+Visualization
+-------------
+
 You can use the two parts separately. I.e. you can just use the JavaScript
 widget for visualizing and analyzing sequence and features. See HTML files in
-the demo directory.
+the demo directory. Also README file in src/django/giraffe/analyze/static/js
+describes how to use just the JavaScript plasmid drawing widget.
 
-
-See README file in src/django/giraffe/analyze/static/js on how to use the
-JavaScript plasmid drawing widget.
-
+Feature Detection
+-----------------
 
 Requirement for Django service:
 
@@ -25,7 +29,6 @@ Requirement for Django service:
 	BioPython (1.56) - ORF detection via BioPython
 		(You don't need NumPy for BioPython)
 	MySQL, and mysql-python module
-
 
 Install Django service:
 
@@ -39,7 +42,6 @@ Install Django service:
 	
 	cd src/django/giraffe; python manage.py syncdb --noinput
 
-
 Run test server:
 
 	cd src/django/giraffe; python manage.py runserver
@@ -47,7 +49,6 @@ Run test server:
 	Then visit "/"
 
 	Click on "See an example" to see an example.
-
 
 API:
 
@@ -68,7 +69,6 @@ API:
 	local computer, and load them in your browser. These files show how you can
 	incorporate Giraffe sequence map and analyzer widgets in your web app.
 	
-
 How to build your own features database:
 
 	To be added later.
