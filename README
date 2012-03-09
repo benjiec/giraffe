@@ -1,7 +1,7 @@
 Giraffe: tool for a) detecting popular features in DNA sequence, b) creating
 maps of those features, and c) performing sequence analysis.
 
-Example: http://addgene.org:8800/
+Example: http://www.addgene.org:8800/
 
 This software was written and copyrighted by Addgene, and released under the
 MIT License. See LICENSE file. It is now maintained by Benjie Chen.
