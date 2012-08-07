@@ -415,10 +415,10 @@ window.GiraffeDraw = function () {
         thi$.click = function(event) {
             if (this.map.feature_click_callback) {
                 this.map.feature_click_callback(basic_feature);
-            } 
+            }
             /* benjie: don't do this for now...
             else {
-               
+
                 if (this.opaque) {
                     this.lighter();
                     this.opaque = false;
@@ -426,7 +426,7 @@ window.GiraffeDraw = function () {
                     this.bolder();
                     this.opaque = true;
                 }
-                
+
             }*/
         };
 
@@ -1362,7 +1362,7 @@ window.GiraffeDraw = function () {
             function draw_tic_mark(a) {
                 var r0, r1, xy0, xy1, tic,
                     xyl, label_pos, label;
- 
+
                 // use thi$ for paper because `this` is killed by local scope
                 r0 = tic_mark_radius - tic_mark_length/2;
                 r1 = tic_mark_radius + tic_mark_length/2;
@@ -2145,8 +2145,8 @@ window.GiraffeDraw = function () {
                 }
 
                 // Which nth of the plasmid is the feature in?
-                section = Math.floor(nlists*(feature_center - plasmid_left)/
-                                                 plasmid_width);
+                section = Math.abs(Math.floor(nlists * (feature_center - plasmid_left) /
+                                              plasmid_width));
                 // Is it in the top or bottom?
                 bottom = section % 2;
 
