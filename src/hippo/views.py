@@ -8,9 +8,10 @@ from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
 
 
-"""
-post view: post a sequence and run the sequence through blat and orf
-detection.
+def post(request):
+    """
+    post view: post a sequence and run the sequence through blat and orf
+    detection.
 
     expects: db and sequence
     response:
@@ -27,8 +28,8 @@ detection.
 
         3. otherwise, redirects to the 'get' view that returns JSON
         array of features.
-"""
-def post(request):
+    """
+
     assert (request.method == 'POST')
     db_name = request.POST['db']
     sequence = request.POST['sequence']
@@ -42,6 +43,7 @@ def post(request):
                 u = u+'/'+hash+'/'+db_name
             return redirect(u)
         return redirect(reverse(get,args=[hash,db_name]))
+
     except Exception as e:
         # print 'Blat error on sequence: '+str(sequence)
         if 'next' in request.POST:
@@ -63,6 +65,7 @@ def get(request,hash,db_name):
     cutters and non-cutter features. Otherwise, return all cutters and
     non-cutter features.
     """
+
     db = models.Feature_Database.objects.get(name=db_name)
     sequence = models.Sequence.objects.get(db=db,hash=hash)
 
