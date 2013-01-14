@@ -13,9 +13,9 @@ from __future__ import division
 from copy import deepcopy
 from operator import attrgetter
 
-from giraffe.blat.models import Feature_Type
-from giraffe.blat.models import Feature_DB_Index
-from giraffe.blat.models import Sequence_Feature
+from hippo.models import Feature_Type
+from hippo.models import Feature_DB_Index
+from hippo.models import Sequence_Feature
 
 ##############################################################################
 ## Global Constants

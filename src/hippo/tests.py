@@ -4,7 +4,7 @@ import re
 import unittest
 import giraffe.simple_test as st
 st.setup()
-import giraffe.blat.models as models
+import hippo.models as models
 import django
 
 class TestFeature(object):

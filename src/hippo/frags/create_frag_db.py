@@ -59,11 +59,11 @@ def reverse_complement(s):
 
 
 def create_data_file(db):
-    from giraffe.blat.models import Feature_Type
-    from giraffe.blat.models import Feature_Database
-    from giraffe.blat.models import Feature_In_Database
-    from giraffe.blat.models import Feature
-    from giraffe.blat.models import Feature_DB_Index
+    from hippo.models import Feature_Type
+    from hippo.models import Feature_Database
+    from hippo.models import Feature_In_Database
+    from hippo.models import Feature
+    from hippo.models import Feature_DB_Index
 
     fdb = Feature_Database.objects.get(name=db)
     enzyme_type = Feature_Type.objects.get(type="Enzyme")
@@ -144,13 +144,10 @@ def create_data_file(db):
 
 
 if __name__ == '__main__':
+    import os
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "server.settings")
+
     import sys
-    sys.path.append('../../..')
-
-    from django.core.management import setup_environ
-    import giraffe.settings
-    setup_environ(giraffe.settings)
-
     db = sys.argv[1]
     output = create_data_file(db)
 

@@ -1163,8 +1163,7 @@ window.GiraffeDraw = function () {
                     large_angle = this.real_size() > 180 ? 1 : 0;
 
                     arc = this.map.paper.path(svg.move(xy0.x, xy0.y) +
-                                         svg.arc(this.radius, xy1.x, xy1.y,
-                                                 large_angle));
+                                              svg.arc(this.radius, xy1.x, xy1.y, large_angle));
                     arc.attr({"stroke-width": this.width});
 
                     this.arrow_set.push(arc);
@@ -1192,8 +1191,8 @@ window.GiraffeDraw = function () {
 
                 // Apply the feature-wide properties to the whole feature
                 this.feature_set.attr({"stroke":         this.color,
-                                   "stroke-linecap": "butt",
-                                   "opacity":        this.opacity});
+                                       "stroke-linecap": "butt",
+                                       "opacity":        this.opacity});
 
                 if (this.map.is_digest() && this.type() != ft.enzyme) {
                     this.feature_set.attr("title", this.label_name());
@@ -1328,8 +1327,7 @@ window.GiraffeDraw = function () {
 
                 label.attr({"fill": this.color,
                             "font-size": this.map.label_font_size(),
-                            "opacity": 1.0,
-                            "title": label_full_name });
+                            "opacity": 1.0 });
 
                 this.label_set.push(label_line);
                 this.label_set.push(label);
@@ -1840,8 +1838,8 @@ window.GiraffeDraw = function () {
 
                 // Apply the feature-wide properties to the whole feature
                 this.feature_set.attr({"stroke": this.color,
-                                   "stroke-linecap": "butt",
-                                   "opacity": this.opacity});
+                                       "stroke-linecap": "butt",
+                                       "opacity": this.opacity});
 
                 if (this.map.is_digest() && this.type() != ft.enzyme) {
                     this.feature_set.attr("title", this.label_name());

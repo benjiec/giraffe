@@ -15,8 +15,8 @@ class BadSequenceError(Exception):
 class Giraffe_Mappable_Model(models.Model):
     """
     This is an abstract class for other apps to use with their models;
-    this class requires the giraffe.blat app being deployed with the
-    app using this class.
+    this class requires the hippo app being deployed with the app
+    using this class.
     """
 
     class Meta:

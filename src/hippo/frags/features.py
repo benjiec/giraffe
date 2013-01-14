@@ -3,8 +3,8 @@ import tempfile
 
 from django.conf import settings
 
-from giraffe.blat.models import Sequence
-from giraffe.blat.frags.frags_to_features import frags_to_features
+from hippo.models import Sequence
+from hippo.frags.frags_to_features import frags_to_features
 
 # For Debugging
 import time

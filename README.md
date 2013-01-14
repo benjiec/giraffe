@@ -3,8 +3,9 @@ Giraffe Feature Detection and Mapping
 
 Example: http://www.addgene.org:8800/
 
-This software was written and copyrighted by Addgene, and released under the
-MIT License. See LICENSE file. It is now maintained by Benjie Chen.
+This software was originally written by Misha Wolfson and Benjie Chen, and
+copyrighted by Addgene, and released under the MIT License. See LICENSE file.
+It is now maintained by Benjie Chen.
 
 The software is mostly divided into two parts: a Django based service that
 detects features within a sequence, and a set of JavaScript widgets that
@@ -27,14 +28,6 @@ Requirement for Django service: see requirements.txt for Python dependencies, an
 provision/provision.sh for general system dependencies. You can use the later
 to setup a Vagrant instance, for example.
 
-Install Django service:
-
-'''
-git clone git@github.com:benjiec/giraffe.git
-cd giraffe
-cd src/hippo/frags; gcc -O6 -o bin/frags frags.c
-'''
-
 Set up MySQL
 
 '''
@@ -43,12 +36,14 @@ mysql
 > CREATE DATABASE giraffe CHARACTER SET 'utf8'
 '''
 
-Create models
+Install Django service:
 
 '''
-cd src
-python manage.py migrate
-python manage.py syncdb --noinput
+git clone git@github.com:benjiec/giraffe.git
+cd giraffe
+(cd src; python manage.py migrate)
+(cd src/hippo/frags; gcc -O6 -o bin/frags frags.c)
+(cd src; PYTHONPATH=. python hippo/frags/create_frag_db.py default > hippo/frags/data/default.data)
 '''
 
 Run test server
