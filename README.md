@@ -1,40 +1,37 @@
-Giraffe Feature Detection and Mapping
--------------------------------------
+Sequence Feature Detection and Mapping
+--------------------------------------
 
-Example: http://www.addgene.org:8800/
-
-This software was originally written by Misha Wolfson and Benjie Chen, and
+This software was originally written by Misha Wolfson and Benjie Chen,
 copyrighted by Addgene, and released under the MIT License. See LICENSE file.
 It is now maintained by Benjie Chen.
 
-The software is mostly divided into two parts: a Django based service that
-detects features within a sequence, and a set of JavaScript widgets that
-visualize the sequence, features, digests, etc.
+The software is mostly divided into two parts. Giraffe is a set of Javascripts
+that visualize sequences and sequence features. Hippo is a Django/Python
+frontend for NCBI Blast. Hippo and Giraffe can be used together to construct
+database of sequence features, detect features in plasmid sequences, and
+visualize the features on a plasmid map.
 
 
-Visualization
--------------
+Giraffe - Visualization
+-----------------------
 
-You can use the two parts separately. I.e. you can just use the JavaScript
-widget for visualizing and analyzing sequence and features. See HTML files in
-the demo directory. Also README file in src/analyze/static/js describes how to
-use just the JavaScript plasmid drawing widget.
+You can use Giraffe independently. See HTML files in src/giraffe/demo
+directory. Also README file in src/giraffe/static/js describes how to use just
+the Javascript plasmid drawing widget.
 
 
-Feature Detection
------------------
+Hippo - BLAST sequence feature detection
+----------------------------------------
 
-Requirement for Django service: see requirements.txt for Python dependencies, and
-provision/provision.sh for general system dependencies. You can use the later
-to setup a Vagrant instance, for example.
+Requirements:
 
-Set up MySQL
+  * System requirements: see provison/provision.sh (you can use this to
+    provision a Vagrant instance, e.g.)
 
-'''
-mysql
-> DROP DATABASE giraffe;
-> CREATE DATABASE giraffe CHARACTER SET 'utf8'
-'''
+  * Python requirements: pip install -r requirements.txt
+
+  * NCBI: install NCBI Blast toolkit (this takes awhile): cd ncbi; . install
+
 
 Install Django service:
 
@@ -42,9 +39,10 @@ Install Django service:
 git clone git@github.com:benjiec/giraffe.git
 cd giraffe
 (cd src; python manage.py migrate)
-(cd src/hippo/frags; gcc -O6 -o bin/frags frags.c)
-(cd src; PYTHONPATH=. python hippo/frags/create_frag_db.py default > hippo/frags/data/default.data)
+# sqlite database will now be in src
 '''
+
+TODO: give instruction for creating ncbi blast database
 
 Run test server
 
@@ -52,7 +50,8 @@ Run test server
 cd src; python manage.py runserver 0.0.0.0:8000
 '''
 
-Click on "See an example" to see an example.
+Then goto http://0.0.0.0:8000/demo/, and click on "See an example" to see an
+example.
 
 
 API
@@ -80,8 +79,8 @@ local computer, and load them in your browser. These files show how you can
 incorporate Giraffe sequence map and analyzer widgets in your web app.
 
 
-Building Features DB
---------------------
+Using Hippo as a BLAST frontend
+-------------------------------
 
 TBA
 

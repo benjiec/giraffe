@@ -13,15 +13,15 @@ ADMINS = ( ('Your Name Here', 'email@address.com'), )
 
 MANAGERS = ADMINS
 
-DATABASES = {}
-DATABASES['default'] = {
-  'ENGINE': 'django.db.backends.mysql',
-  'OPTIONS': { "init_command": "SET storage_engine=INNODB" },
-  'NAME': 'giraffe_dev',
-  'USER': 'root',
-  'PASSWORD': 'password',
-  'HOST': '',
-  'PORT': '',
+DATABASES = {
+  'default': {
+    'ENGINE': 'django.db.backends.sqlite3',
+    'NAME': 'sqlite3-db',
+    'USER': '',
+    'PASSWORD': '',
+    'HOST': '',
+    'PORT': '',
+  }
 }
 
 # Local time zone for this installation. Choices can be found here:

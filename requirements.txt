@@ -1,6 +1,5 @@
 Django >= 1.4
 South >= 0.7.2
-mysql-python
 
 # BioPython - ORF detection
 numpy

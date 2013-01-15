@@ -1,14 +1,10 @@
+Switch to using ncbi blast
 
 How to use widget embedded
 
 How to add additional features to list of features
 
-Script to compile binary and create initial data file
+Script/example for creating blast DB
 
-What happens when DB gets updated, to existing sequence? do they expire?
-
-UI/Trigger to compile frag DB
- - blow away feature db index
- - save sequences?
- - reset sequence features?
+UI/Trigger to compile blast DB
 
