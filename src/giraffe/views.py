@@ -1,7 +1,5 @@
 from django.http import HttpResponse
-from Bio.Alphabet import IUPAC
-from Bio.Seq import Seq
-import re
+import features
 import json
 import httplib
 import orfs
@@ -19,11 +17,7 @@ def post(request):
     """
 
     db_name = request.REQUEST['db'].strip()
-    sequence = request.REQUEST['sequence'].strip()
-    sequence = re.sub(r'\s+', '', sequence)
-
-    # this throws exception if DNA is not valid
-    sequence = str(Seq(sequence, IUPAC.unambiguous_dna))
+    sequence = features.clean_sequence(request.REQUEST['sequence'])
 
     orf_list, tag_list = orfs.detect_orfs_and_tags(sequence)
     res = [x.to_dict() for x in orf_list+tag_list]

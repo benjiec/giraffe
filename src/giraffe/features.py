@@ -1,3 +1,15 @@
+from Bio.Alphabet import IUPAC
+from Bio.Seq import Seq
+import re
+
+
+def clean_sequence(sequence):
+  sequence = sequence.strip()
+  sequence = re.sub(r'\s+', '', sequence)
+  # this throws exception if DNA is not valid
+  sequence = str(Seq(sequence, IUPAC.unambiguous_dna))
+  return sequence
+
 
 class Constant_Choices:
 

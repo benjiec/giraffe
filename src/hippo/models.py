@@ -47,7 +47,12 @@ class Feature(models.Model):
 class Feature_Database(models.Model):
 
     name = models.CharField(max_length=64,unique=True)
-    features = models.ManyToManyField(Feature)
+    features = models.ManyToManyField(Feature, blank=True, null=True)
     last_built = models.DateTimeField(null=True,blank=True)
 
+    def __unicode__(self):
+       return self.name
+
+    class Meta:
+        verbose_name = "Feature Database"
 
