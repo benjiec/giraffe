@@ -1,15 +1,14 @@
 Report mutations
 
+Analyzer - line wrap sequence tab using CSS
+
 How to get enzymes?
-
-Partial match via blast?
-
-Handle degenerates, etc.
 
 How to use widget embedded
   - Add JS helper to initial POST
+  - How to add additional features to list of features
 
-How to add additional features to list of features
+Handle degenerates, etc.
 
 Script/example for creating blast DB
 
