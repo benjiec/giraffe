@@ -1,22 +1,32 @@
-
-import models
 from Bio.Seq import Seq
+from features import Detected_Feature_Base, Feature_Type_Choices
 import math
 import tags
 
 trans_table = 1 # standard translation table
 min_protein_len = 150
 
-def detect_orfs(sequence_object):
-    sequence_object.clear_orf_features()
 
-    # convert to DNA sequence, to get rid of degenerates and 'U's...
-    dna = models.Sequence.convert_to_dna(sequence_object.sequence)
+class Orf(Detected_Feature_Base):
 
-    # double up sequence, so we can detect features across 0 bp
-    # boundary
+  def __init__(self, feature, start, end, clockwise, orf_frame=None):
+    super(Orf, self).__init__(feature, start, end, clockwise, Feature_Type_Choices.ORF[1])
+    self.orf_frame = orf_frame
+
+  def to_dict(self):
+    r = super(Orf, self).to_dict()
+    if self.orf_frame is not None:
+      r['orf_frame'] = self.orf_frame
+    return r 
+
+
+def detect_orfs_and_tags(dna):
+    orf_list = []
+    tag_list = []
+
+    # double up sequence, so we can detect features across 0 bp boundary
     seq = Seq(dna*2)
-    seq_len = len(sequence_object.sequence)
+    seq_len = len(dna)
     aa_len = int(math.floor(seq_len/3.0))
 
     for strand,nuc in [(+1,seq), (-1,seq.reverse_complement())]:
@@ -31,8 +41,8 @@ def detect_orfs(sequence_object):
             #print trans
             #print 'trans_len is '+str(trans_len)
 
-            # go through the translation and find end codons that
-            # follow a start codon.
+	    # go through the translation and find end codons that follow a
+	    # start codon.
             while aa_start < trans_len and aa_start < aa_len:
                 aa_end = trans.find("*", aa_start)
                 #print 'search for * from '+str(aa_start)+' found '+str(aa_end)
@@ -42,9 +52,9 @@ def detect_orfs(sequence_object):
                     # no more stop codon, just abort...
                     break
 
-                # we start looking for a M at the earliest at aa_end-aa_len+1,
-                # since we don't want an ORF that's actually bigger than the
-                # original sequence
+		# we start looking for a M at the earliest at aa_end-aa_len+1,
+		# since we don't want an ORF that's actually bigger than the
+		# original sequence
                 if aa_start < aa_end-aa_len+1:
                     aa_start = aa_end-aa_len+1
                 start_codon = trans.find('M', aa_start, aa_end)
@@ -75,18 +85,11 @@ def detect_orfs(sequence_object):
                         if start < 0:
                             start = seq_len+start
 
-                    f = models.Sequence_Feature_Annotated()
-                    f.sequence = sequence_object
-                    f.feature_name = 'ORF frame '+str(frame+1)
-                    f.feature_type_id = models.Feature_Type.ORF
-                    f.orf_frame = frame
-                    f.start = start
-                    f.end = end
-                    if strand == 1:
-                        f.clockwise = True
-                    else:
-                        f.clockwise = False
-                    f.save()
+                    f = Orf(feature='ORF frame '+str(frame+1),
+                            start=start, end=end, clockwise = True if strand == 1 else False,
+                            orf_frame=frame)
+                    orf_list.append(f)
+
                     orf_annotated = f
                     #print str(f.to_dict())
 
@@ -111,19 +114,13 @@ def detect_orfs(sequence_object):
                                 if tag_start < 0:
                                     tag_start = seq_len+tag_start
 
-                            f = models.Sequence_Feature_Annotated()
-                            f.sequence = sequence_object
-                            f.orf_annotated = orf_annotated
-                            f.feature_name = tag
-                            f.feature_type_id = models.Feature_Type.FEATURE
-                            f.start = tag_start
-                            f.end = tag_end
-                            if strand == 1:
-                                f.clockwise = True
-                            else:
-                                f.clockwise = False
-                            f.save()
-                            #print str(f.to_dict())
+                            f = Detected_Feature_Base(feature=tag, start=tag_start, end=tag_end,
+                                                      clockwise = True if strand == 1 else False,
+                                                      type = Feature_Type_Choices.FEATURE[1])
+                            tag_list.append(f)
+
 
                 aa_start = aa_end+1
+
+    return (orf_list, tag_list)
 

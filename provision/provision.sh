@@ -14,15 +14,11 @@ else
 fi
 
 sudo apt-get update
-sudo apt-get -y install bzip2
-sudo apt-get -y install less
-sudo apt-get -y install lsof
-sudo apt-get -y install vim
+sudo apt-get -y install bzip2 less lsof vim
 sudo apt-get -y install gcc g++ make gdb
 sudo apt-get -y install zlib1g-dev
 sudo apt-get -y install sendmail
-sudo apt-get -y install git
-sudo apt-get -y install build-essential
+sudo apt-get -y install git curl build-essential
 sudo apt-get -y install python2.7 python2.7-doc python2.7-dev python-pip python-setuptools
 
 # install python virtualenv
