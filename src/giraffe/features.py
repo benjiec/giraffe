@@ -1,6 +1,13 @@
 from Bio.Alphabet import IUPAC
 from Bio.Seq import Seq
 import re
+import os
+
+
+_MY_DIR, _MY_FILE = os.path.split(os.path.abspath(__file__))
+NCBI_DIR = _MY_DIR+'/../../ncbi'
+NCBI_BIN_DIR = NCBI_DIR+'/bin'
+NCBI_DAT_DIR = NCBI_DIR+'/blastdb'
 
 
 def clean_sequence(sequence):
