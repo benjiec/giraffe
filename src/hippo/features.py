@@ -77,6 +77,6 @@ class Detected_Feature_Base(object):
                 clockwise=self.clockwise,
                 feature=self.feature,
                 type_id=t[0],
-                show_feature=True)
+                show_feature=1)
 
 

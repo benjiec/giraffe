@@ -1,6 +1,6 @@
-Cache results on POST
-
 Switch to using ncbi blast
+
+Handle degenerates, etc.
 
 How to use widget embedded
   - Add JS helper to initial POST
