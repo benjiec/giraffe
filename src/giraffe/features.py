@@ -88,8 +88,9 @@ class Feature_Type_Choices(Constant_Choices):
 
 class Detected_Feature_Base(object):
 
-  def __init__(self, feature, start, end, clockwise, type):
-    self.feature = feature
+  def __init__(self, name, label, start, end, clockwise, type):
+    self.name = name
+    self.label = label
     self.start = start
     self.end = end
     self.clockwise = clockwise
@@ -102,7 +103,8 @@ class Detected_Feature_Base(object):
     return dict(start=self.start,
                 end=self.end,
                 clockwise=self.clockwise,
-                feature=self.feature,
+                label=self.label,
+                name=self.name,
                 type_id=t[0],
                 show_feature=1)
 
@@ -180,8 +182,8 @@ def blast(sequence, db):
           feature = alignment.hit_def
           if hit_start != 1 or hit_end != accession.feature_length:
             feature = '%s (%s-%s/%s)' % (feature, hit_start, hit_end, accession.feature_length)
-          
-          feature_list.append(Detected_Feature_Base(feature, start, end, clockwise, accession.type))
+
+          feature_list.append(Detected_Feature_Base(feature, alignment.hit_def, start, end, clockwise, accession.type))
 
     os.unlink(outfile)
     os.unlink(infile)

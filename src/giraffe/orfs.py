@@ -9,8 +9,8 @@ min_protein_len = 150
 
 class Orf(Detected_Feature_Base):
 
-  def __init__(self, feature, start, end, clockwise, orf_frame=None):
-    super(Orf, self).__init__(feature, start, end, clockwise, Feature_Type_Choices.ORF[1])
+  def __init__(self, name, start, end, clockwise, orf_frame=None):
+    super(Orf, self).__init__(name, name, start, end, clockwise, Feature_Type_Choices.ORF[1])
     self.orf_frame = orf_frame
 
   def to_dict(self):
@@ -85,7 +85,7 @@ def detect_orfs_and_tags(dna):
                         if start < 0:
                             start = seq_len+start
 
-                    f = Orf(feature='ORF frame '+str(frame+1),
+                    f = Orf(name='ORF frame '+str(frame+1),
                             start=start, end=end, clockwise = True if strand == 1 else False,
                             orf_frame=frame)
                     orf_list.append(f)
@@ -114,7 +114,7 @@ def detect_orfs_and_tags(dna):
                                 if tag_start < 0:
                                     tag_start = seq_len+tag_start
 
-                            f = Detected_Feature_Base(feature=tag, start=tag_start, end=tag_end,
+                            f = Detected_Feature_Base(name=tag, label=tag, start=tag_start, end=tag_end,
                                                       clockwise = True if strand == 1 else False,
                                                       type = Feature_Type_Choices.FEATURE[1])
                             tag_list.append(f)

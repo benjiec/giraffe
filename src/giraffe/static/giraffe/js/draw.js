@@ -227,7 +227,8 @@ window.GiraffeDraw = function () {
 
         // Private data members, from the properties of the feature argument
         // since hash tables and objects are one and the same in js
-        var _name = feat.feature;
+        var _name = feat.name;
+        var _label = feat.label;
         var _start = parseInt(feat.start, 10);
         var _end = parseInt(feat.end, 10);
         var _type = parseInt(feat.type_id, 10);
@@ -243,6 +244,7 @@ window.GiraffeDraw = function () {
         var _id = Feature.nfeat;
 
         // Accessors for private properties set at creation
+        this.label = function() { return _label; };
         this.name = function() { return _name; };
         this.start = function() { return _start; };
         this.end = function() { return _end; };
@@ -496,7 +498,7 @@ window.GiraffeDraw = function () {
 
         // Automatically provide the cut site in cutter labels
         thi$.label_name = function () {
-            var label_name = this.name();
+            var label_name = this.label();
             if (label_name.length > 20) { label_name = label_name.substring(0,20)+"..."; }
             if (this.type() == ft.enzyme && this.actually_have_cut()) {
                 label_name += " (" + this.cut() + ")";
