@@ -1,6 +1,6 @@
 from django.db import models
 from django.db import utils
-import features
+import giraffe.features
 import datetime
 import hashlib
 import re

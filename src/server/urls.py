@@ -6,7 +6,7 @@ django.contrib.admin.autodiscover()
 
 urlpatterns = patterns('',
     (r'^admin/', include(django.contrib.admin.site.urls)),
-    (r'^hippo/', include('hippo.urls')),
+    (r'^giraffe/', include('giraffe.urls')),
 )
 
 if settings.DEBUG:
