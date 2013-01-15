@@ -3,7 +3,7 @@ from hippo.models import Feature_Database
 import os
 import tempfile
 import subprocess
-from giraffe.features import clean_sequence, NCBI_BIN_DIR, NCBI_DAT_DIR
+from giraffe.features import clean_sequence, NCBI_BIN_DIR, NCBI_DAT_DIR, Blast_Accession
 
 
 class Command(BaseCommand):
@@ -16,11 +16,11 @@ class Command(BaseCommand):
         infile = f.name
         for feature in feature_db.features.all():
           #print feature.name
-          f.write(">gnl|hippo-%s|%s-%s %s\n%s\n" % (
+          data = clean_sequence(feature.sequence)
+          f.write(">gnl|%s|%s %s\n%s\n" % (
                    feature_db.name,
-                   feature.type.type,
-                   feature.id,
-                   feature.name, clean_sequence(feature.sequence)))
+                   Blast_Accession.make(type=feature.type.type, feature_id=feature.id, feature_length=len(data)),
+                   feature.name, data))
 
       cmd = "%s/makeblastdb -in %s -out %s/%s -title %s -dbtype nucl -parse_seqids -input_type fasta" % (
               NCBI_BIN_DIR, infile, NCBI_DAT_DIR, feature_db.name, feature_db.name)

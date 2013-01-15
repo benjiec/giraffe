@@ -4,11 +4,9 @@ import re
 import os
 
 
-_MY_DIR, _MY_FILE = os.path.split(os.path.abspath(__file__))
-NCBI_DIR = _MY_DIR+'/../../ncbi'
-NCBI_BIN_DIR = NCBI_DIR+'/bin'
-NCBI_DAT_DIR = NCBI_DIR+'/blastdb'
-
+##################################
+# Sequence cleaning
+#
 
 def clean_sequence(sequence):
   sequence = sequence.strip()
@@ -17,6 +15,11 @@ def clean_sequence(sequence):
   sequence = str(Seq(sequence, IUPAC.unambiguous_dna))
   return sequence
 
+
+
+##################################
+# Feature types
+#
 
 class Constant_Choices:
 
@@ -78,6 +81,11 @@ class Feature_Type_Choices(Constant_Choices):
     return [t[1] for t in Feature_Type_Choices.choices()]
 
 
+
+##################################
+# Detected features
+#
+
 class Detected_Feature_Base(object):
 
   def __init__(self, feature, start, end, clockwise, type):
@@ -98,4 +106,84 @@ class Detected_Feature_Base(object):
                 type_id=t[0],
                 show_feature=1)
 
+
+
+##################################
+# BLAST
+#
+
+_MY_DIR, _MY_FILE = os.path.split(os.path.abspath(__file__))
+NCBI_DIR = _MY_DIR+'/../../ncbi'
+NCBI_BIN_DIR = NCBI_DIR+'/bin'
+NCBI_DAT_DIR = NCBI_DIR+'/blastdb'
+
+
+class Blast_Accession(object):
+
+  @staticmethod
+  def make(type, feature_id, feature_length):
+    return '%s-%s-%s' % (type, feature_id, feature_length)
+
+  def __init__(self, accession):
+    a = accession.split('-')
+    self.type = a[0]
+    self.feature_id = int(a[1])
+    self.feature_length = int(a[2])
+
+
+from Bio.Blast.Applications import NcbiblastnCommandline
+from Bio.Blast import NCBIXML
+import tempfile
+import subprocess
+
+def blast(sequence, db):
+    infile = None
+    feature_list = []
+    input = clean_sequence(sequence)
+
+    with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
+      infile = f.name 
+      f.write(">Query\n%s\n" % (input,))
+
+    outfile = "%s.out.xml" % (infile,)
+    blast_cl = NcbiblastnCommandline(query=infile, db="%s/%s" % (NCBI_DAT_DIR, db),
+                                     evalue=0.001, word_size=6, outfmt=5, out=outfile)
+    cl = str(blast_cl)
+    cl = "%s/%s" % (NCBI_BIN_DIR, cl)
+    r = subprocess.call(cl.split(" "))
+    if r != 0:
+      raise Exception("Blast failed: %s" % (cl,))
+    
+    with open(outfile, "r") as f:
+      blast_record = NCBIXML.read(f)
+      for alignment in blast_record.alignments:
+        accession = Blast_Accession(alignment.accession)
+        for hsp in alignment.hsps:
+          #print "seq %s %s %s" % (accession.type, accession.feature_length, alignment.hit_def,)
+          #print 'identities %s/%s' % (hsp.identities, len(hsp.query))
+          #print 'qs %s-%s, ms %s-%s' % (hsp.query_start, hsp.query_end, hsp.sbjct_start, hsp.sbjct_end)
+          #print '    '+hsp.query[0:75] + '...'
+          #print '    '+hsp.match[0:75] + '...'
+          #print '    '+hsp.sbjct[0:75] + '...'
+
+          start = hsp.query_start
+          end = hsp.query_end
+          if hsp.sbjct_end > hsp.sbjct_start:
+            clockwise = True
+            hit_start = hsp.sbjct_start
+            hit_end = hsp.sbjct_end
+          else:
+            clockwise = False
+            hit_end = hsp.sbjct_start
+            hit_start = hsp.sbjct_end
+
+          feature = alignment.hit_def
+          if hit_start != 1 or hit_end != accession.feature_length:
+            feature = '%s (%s-%s/%s)' % (feature, hit_start, hit_end, accession.feature_length)
+          
+          feature_list.append(Detected_Feature_Base(feature, start, end, clockwise, accession.type))
+
+    os.unlink(outfile)
+    os.unlink(infile)
+    return feature_list
 

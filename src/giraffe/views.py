@@ -1,15 +1,11 @@
 from django.http import HttpResponse
 import features
+import orfs
 import json
 import httplib
-import orfs
 
 
-from django.shortcuts import redirect
-from django.core.urlresolvers import reverse
-
-
-def post(request):
+def _post(request):
     """
     Post a sequence and run the sequence through blast and orf detection.
     Expects: db and sequence
@@ -19,8 +15,13 @@ def post(request):
     db_name = request.REQUEST['db'].strip()
     sequence = features.clean_sequence(request.REQUEST['sequence'])
 
+    # feature detection
+    feature_list = features.blast(sequence, db_name)
+
+    # ORFs and tags
     orf_list, tag_list = orfs.detect_orfs_and_tags(sequence)
-    res = [x.to_dict() for x in orf_list+tag_list]
+
+    res = [x.to_dict() for x in feature_list+orf_list+tag_list]
 
     # now sort everything by start
     res.sort(cmp=lambda x,y:cmp(int(x['start']),int(y['start'])))
@@ -44,3 +45,11 @@ def post(request):
 
     return http_res
  
+
+def post(request):
+  try:
+    return _post(request)
+  except Exception as e:
+    print str(e)
+    raise(e)
+
