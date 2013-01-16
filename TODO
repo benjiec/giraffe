@@ -1,5 +1,3 @@
-Report mutations
-
 How to get enzymes?
 
 ---
@@ -20,6 +18,8 @@ Add tests
   - Cutter detection
   - JS test to show we list in frame tags with ORF
   - JS test linear mode specifies circular boundary ORFs
+
+Show alignment part is slow; can we optimize this?
 
 Blast API
   - Return in order of escore
