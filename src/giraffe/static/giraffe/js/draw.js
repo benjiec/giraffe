@@ -2160,7 +2160,9 @@ window.GiraffeDraw2 = function () {
 
                 if (f.should_draw_label()) {
                     // push it on the appropriate list
-                    label_lists[bottom][section].push(f);
+                    if (label_lists[bottom][section]) {
+                        label_lists[bottom][section].push(f);
+                    }
                 }
             }
 

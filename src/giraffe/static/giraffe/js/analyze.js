@@ -552,7 +552,9 @@ window.GiraffeAnalyze2 = function ($,gd,options) {
             // Update cutters_to_show to reflect the checkboxes selected in that pane
             cutters_to_show = [];
             $(map_panes.pane(pane)).find("input[checked]").each(function () {
-                cutters_to_show.push(parseInt($(this).attr('name').match(/\d+/), 10));
+                if ($(this).attr('name')) {
+                    cutters_to_show.push(parseInt($(this).attr('name').match(/\d+/), 10));
+                }
             });
 
             if ($(map_panes.pane(pane))
