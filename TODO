@@ -1,14 +1,13 @@
 
-Handle degenerates, etc.
-
 How to use widget embedded
-  - Add JS helper to initial POST
   - How to add additional features to list of features
   - Make layers visible and not visible
+  - Add JS helper to initial POST
 
 Script/example for creating blast DB
 
 Add tests
+  - Allow GATCRYWSMKHBVDN
   - Orf detection
   - Cutter detection - report start, end, cut correctly
   - Passing cutter information to javascript
