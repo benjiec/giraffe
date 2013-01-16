@@ -150,50 +150,6 @@ window.GiraffeAnalyze = function ($,gd,options) {
         return this.__all; 
     };
 
-    Cutter_List.prototype.non=function(){
-        var i;
-        var all_cutters;
-        var all_cutters_hash;
-        var have_these;
-
-        if (this.__non) { return this.__non; }
-
-        all_cutters = [
-            'AatII', 'Acc65I', 'AccI', 'AclI', 'AfeI', 'AflII',
-            'AgeI', 'ApaI', 'ApaLI', 'ApoI', 'AscI', 'AseI',
-            'AsiSI', 'AvrII', 'BamHI', 'BclI', 'BglII', 'Bme1580I',
-            'BmtI', 'BsaHI', 'BsiEI', 'BsiWI', 'BspEI', 'BspHI',
-            'BsrGI', 'BssHII', 'BstBI', 'BstZ17I', 'BtgI', 'ClaI',
-            'DraI', 'EaeI', 'EagI', 'EcoRI', 'EcoRV', 'FseI',
-            'FspI', 'HaeII', 'HincII', 'HindIII', 'HpaI', 'KasI',
-            'KpnI', 'MfeI', 'MluI', 'MscI', 'MspA1I', 'NaeI',
-            'NarI', 'NcoI', 'NdeI', 'NgoMIV', 'NheI', 'NotI',
-            'NruI', 'NsiI', 'NspI', 'PacI', 'PciI', 'PmeI',
-            'PmlI', 'PsiI', 'PspOMI', 'PstI', 'PvuI', 'PvuII',
-            'SacI', 'SacII', 'SalI', 'SbfI', 'ScaI', 'SfcI',
-            'SfoI', 'SgrAI', 'SmaI', 'SmlI', 'SnaBI', 'SpeI',
-            'SphI', 'SspI', 'StuI', 'SwaI', 'XbaI', 'XhoI',
-            'XmaI'
-        ];
-        all_cutters_hash = {};
-
-
-        for (i = 0; i < all_cutters.length; i++) {
-            all_cutters_hash[all_cutters[i]] = 1;
-        }
-        have_these = this.all();
-        for (i = 0; i < have_these.length; i++) {
-            delete all_cutters_hash[have_these[i].name()];
-        }
-        this.__non = [];
-        for (i in all_cutters_hash) {
-            if (all_cutters_hash.hasOwnProperty(i)) {
-                this.__non.push(i);
-            }
-        }
-        return this.__non;
-    };
-
     function sequence_tab(dom) {
         var copy_all = 'To copy sequence: click on sequence, hit ctrl/cmd-A, then ctrl/cmd-C';
 
@@ -442,7 +398,6 @@ window.GiraffeAnalyze = function ($,gd,options) {
         var write_digest_data = (function () {
             var list;
             var all = cutters.all();
-            var non = cutters.non();
 
             function make_cutter_list() {
                 var c, i;
@@ -450,8 +405,7 @@ window.GiraffeAnalyze = function ($,gd,options) {
                 var name, s, item;
 
 
-                if (typeof(cutters_to_show) == 'undefined' ||
-                    cutters_to_show.length > 0) {
+                if (typeof(cutters_to_show) == 'undefined' || cutters_to_show.length > 0) {
 
                     for (i = 0; i < all.length; i++) {
                         all_of_this = all[i].other_cutters();
@@ -475,17 +429,6 @@ window.GiraffeAnalyze = function ($,gd,options) {
                             item = $('<tr></tr>').append(name).append(s);
                             $(list).append(item);
                         }
-                    }
-                } else {
-                    // Non-cutters
-                    digest_data_dom.append(
-                        '<p>The following cutters do not cut this sequence.</p>');
-                    for (i = 0; i < non.length; i++) {
-                        name = $('<td></td>')
-                                .addClass('enzyme-label')
-                                .append(non[i]);
-                        item = $('<tr></tr>').append(name).append('<td></td>');
-                        $(list).append(item);
                     }
                 }
             }
@@ -624,18 +567,12 @@ window.GiraffeAnalyze = function ($,gd,options) {
             write_digest_data();
         });
 
-        // Change the name of the "hide all" label to non-cutters
-        $(map_panes.panes).find('input[name="non-cutters"]')
-                          .siblings('.cutter-label')
-                          .text('Non-cutters');
-
         // Add an "all cutters" checkbox
         $(map_panes.panes)
-            .find('input[name="non-cutters"]')
+            .find('input[name="cutters-2"]')
             .closest('td')
-            .before('<td><label><input type="checkbox" ' + 
-                                      'name="all-cutters" value="show" />' +
-                    '<span class="cutter-label">All</span></label></td>');
+            .after('<td><label><input type="checkbox" name="all-cutters" value="show" />' +
+                   '<span class="cutter-label">All</span></label></td>');
                           
 
         // Force rewriting the digest data when the cutter controls are changed
@@ -689,12 +626,6 @@ window.GiraffeAnalyze = function ($,gd,options) {
                 $(this)
                     .closest('tbody')
                     .find('input[name|="cutters"]')
-                    .removeAttr('checked');
-
-                // Make sure no-cutter checkbox is unset
-                $(this)
-                    .closest('tbody')
-                    .find('input[name="non-cutters"]')
                     .removeAttr('checked');
 
                 // Show all cutters below
@@ -1372,21 +1303,14 @@ window.GiraffeAnalyze = function ($,gd,options) {
         var bp; // Start and end of feature
         var name = feature.name(); // Tag to display
 
-        // Only if it's an enzyme:
-        var sequence;
-        var cut_marker = '<sup>&#x25BC;</sup>';
-        var cut_position = feature.cut() - feature.start() + 1;
-
         sequence_viewer_clear_highlight();
         bp = [feature.start(),feature.end()];
 
         // Mark cut site if it's an enzyme
         if (feature.type() == gd.Feature_Type.enzyme) {
-            sequence = feature.clockwise_sequence().toUpperCase(); 
-            sequence = sequence.substring(0, cut_position) + 
-                       cut_marker +
-                       sequence.substring(cut_position);
-            name += ' (' + sequence + ')';
+            if (feature.elucidate()) {
+                name += ' (' + feature.elucidate() + ')';
+            }
         }
 
         sequence_viewer_bp_event_highlight(bp,name);
@@ -1592,9 +1516,7 @@ window.GiraffeControl = function ($,gd_map,dom) {
                 '<td><label><input type="checkbox" ' +
                               'name="cutters-2" value="show" />' +
                 '<span class="cutter-label">2-cutters</span></label></td>' +
-                '<td><label><input type="checkbox" ' +
-                              'name="non-cutters" value="show" />' +
-                '<span class="cutter-label">hide all</span></label></td></tr>' +
+                '</tr>'+
             '</tbody>' +
             '</table></td></tr>');
 
@@ -1612,27 +1534,7 @@ window.GiraffeControl = function ($,gd_map,dom) {
                     opts.push(parseInt($(this).attr('name').match(/\d+/), 10));
                 });
 
-            // Automatically check and uncheck the non-cutters checkbox,
-            // depending on whether or not there are actually cutters shown
-            if (opts.length > 0) {
-                controls.find('input[name="non-cutters"]').removeAttr("checked");
-            } else {
-                controls.find('input[name="non-cutters"]').attr("checked", "checked");
-            }
-
             gd_map.redraw_cutters(opts);
-        });
-
-        // No-cutter checkbox
-        controls.find('input[name="non-cutters"]').click(function (event) {
-            if ($(this).attr("checked")) {
-                controls.find('input[name|="cutters"]').removeAttr("checked");
-                gd_map.redraw_cutters([]);
-            } else {
-                // When 'no cutters' is the only selected checkbox, make it impossible 
-                // to deselect by clicking on itself.
-                $(this).attr("checked", "checked");
-            }
         });
     }
 

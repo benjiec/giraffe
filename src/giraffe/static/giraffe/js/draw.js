@@ -245,6 +245,8 @@ window.GiraffeDraw = function () {
             _default_show_feature = parseInt(feat.show_feature, 10);
         }
         var _clockwise = feat.clockwise;
+        var _elucidate; // only for enzymes
+        if (feat.elucidate) { _elucidate = feat.elucidate; }
         var _cut = parseInt(feat.cut, 10); // only for enzymes;
         var _other_cutters = []; // only for enzymes;
         var _id = Feature.nfeat;
@@ -260,6 +262,7 @@ window.GiraffeDraw = function () {
         this.default_show_feature = function() { return _default_show_feature; };
         // returns - 1 if not enzyme
         this.cut = function() { return _type == ft.enzyme ? (_cut ? _cut : _start) : -1; };
+        this.elucidate = function() { return _elucidate; }
         this.actually_have_cut = function() {
             return _type == ft.enzyme ? (_cut ? true : false) : false;
         };

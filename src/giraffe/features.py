@@ -201,3 +201,71 @@ def blast(sequence, db):
   os.unlink(infile)
   return feature_list
 
+
+
+##################################
+# Restriction enzyme analysis
+#
+
+from Bio.Restriction import CommOnly, RestrictionBatch
+from Bio.Restriction import *
+
+
+class Restriction_Site(Detected_Feature_Base):
+
+  def __init__(self, enzyme, start, end, clockwise, cut):
+    name = str(enzyme)
+    super(Restriction_Site, self).__init__(name, name, start, end, clockwise, Feature_Type_Choices.ENZYME[1])
+    self.enzyme = enzyme
+    self.cut = cut
+
+  def to_dict(self):
+    r = super(Restriction_Site, self).to_dict()
+    r['elucidate'] = self.enzyme.elucidate()
+    r['cut'] = self.cut
+    return r
+
+
+_MyEnzymes = [AatII, AflII, AgeI, ApaI, ApaLI, AscI, AseI,
+              BamHI, BclI, BglII, BstBI, ClaI, DraI, EagI, EarI,
+              EcoRI, EcoRV, FspI, HindIII, HpaI, KpnI, MscI,
+              NarI, NcoI, NdeI, NheI, NotI, NruI, PacI,
+              PmlI, PstI, PvuII, SacI, SacII, SalI, SmaI,
+              SpeI, StuI, XbaI, XhoI, XmaI]
+MyEnzymes = RestrictionBatch([x for x in _MyEnzymes if x.elucidate().find('^') >= 0])
+
+
+def find_restriction_sites(sequence):
+  input = Seq(clean_sequence(sequence))
+  rc = input.reverse_complement()
+  r = MyEnzymes.search(input)
+  cutter_list = []
+  for enzyme in r:
+    v = r[enzyme]
+    for cut in v:
+      pattern = enzyme.elucidate()
+      pattern = re.sub(r'_', '', pattern)
+      cut_after = pattern.find('^')
+      if cut_after < 0:
+        raise Exception('Cannot find cut site for %s (%s)' % (enzyme, pattern))
+      # first try fwd
+      start = cut-cut_after-1
+      end = start+enzyme.size-1
+      # print 'try %s vs %s' % (input[start:end+1].lower(), enzyme.site.lower())
+      if str(input[start:end+1]).lower() == enzyme.site.lower():
+        f = Restriction_Site(enzyme, start+1, end+1, True, cut)
+        cutter_list.append(f)
+        # print 'found %s' % (f.to_dict(),)
+      else:
+        end = cut+cut_after+1
+        start = end-enzyme.size+1
+        # print 'try rc %s vs %s' % (input[start:end+1].reverse_complement().lower(), enzyme.site.lower())
+        if str(input[start:end+1].reverse_complement()).lower() == enzyme.site.lower():
+          f = Restriction_Site(enzyme, start+1, end+1, False, cut)
+          cutter_list.append(f)
+          # print 'found %s' % (f.to_dict(),)
+        else:
+          raise Exception('Cannot find reported cut site %s %s %s %s' % (enzyme, cut, cut_after, pattern)) 
+
+  return cutter_list
+

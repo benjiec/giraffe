@@ -15,7 +15,8 @@ UI/Trigger to compile blast DB
 
 Add tests
   - Orf detection
-  - Cutter detection
+  - Cutter detection - report start, end, cut correctly
+  - Passing cutter information to javascript
   - JS expects alignment match to include | for match, empty space for mismatch
   - JS test to show we list in frame tags with ORF
   - JS test linear mode specifies circular boundary ORFs
@@ -26,4 +27,6 @@ Blast API
   - Return in order of escore
   - Getting word_size from params
   - Need UI widget?
+
+Add back non-cutters analysis, but have to pass this in from backend
 

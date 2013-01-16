@@ -18,10 +18,13 @@ def _post(request):
     # feature detection
     feature_list = features.blast(sequence, db_name)
 
+    # restriction site search
+    cutter_list = features.find_restriction_sites(sequence)
+
     # ORFs and tags
     orf_list, tag_list = orfs.detect_orfs_and_tags(sequence)
 
-    res = [x.to_dict() for x in feature_list+orf_list+tag_list]
+    res = [x.to_dict() for x in feature_list+cutter_list+orf_list+tag_list]
 
     # now sort everything by start
     res.sort(cmp=lambda x,y:cmp(int(x['start']),int(y['start'])))
