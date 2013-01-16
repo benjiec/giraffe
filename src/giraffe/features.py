@@ -114,11 +114,7 @@ class Detected_Feature_Base(object):
 # BLAST
 #
 
-_MY_DIR, _MY_FILE = os.path.split(os.path.abspath(__file__))
-NCBI_DIR = _MY_DIR+'/../../ncbi'
-NCBI_BIN_DIR = NCBI_DIR+'/bin'
-NCBI_DAT_DIR = NCBI_DIR+'/blastdb'
-
+from django.conf import settings
 
 class Blast_Accession(object):
 
@@ -148,10 +144,10 @@ def blast(sequence, db):
       f.write(">Query\n%s\n" % (input,))
 
     outfile = "%s.out.xml" % (infile,)
-    blast_cl = NcbiblastnCommandline(query=infile, db="%s/%s" % (NCBI_DAT_DIR, db),
+    blast_cl = NcbiblastnCommandline(query=infile, db="%s/%s" % (settings.NCBI_DATA_DIR, db),
                                      evalue=0.001, word_size=6, outfmt=5, out=outfile)
     cl = str(blast_cl)
-    cl = "%s/%s" % (NCBI_BIN_DIR, cl)
+    cl = "%s/%s" % (settings.NCBI_BIN_DIR, cl)
     r = subprocess.call(cl.split(" "))
     if r != 0:
       raise Exception("Blast failed: %s" % (cl,))

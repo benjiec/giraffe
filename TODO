@@ -4,13 +4,22 @@ Analyzer - line wrap sequence tab using CSS
 
 How to get enzymes?
 
+---
+
 How to use widget embedded
   - Add JS helper to initial POST
   - How to add additional features to list of features
+  - Visible/not visible change to layers, not type of features
 
 Handle degenerates, etc.
 
 Script/example for creating blast DB
 
 UI/Trigger to compile blast DB
+
+Add tests
+  - Orf detection
+  - Cutter detection
+  - JS test to show we list in frame tags with ORF
+  - JS test linear mode specifies circular boundary ORFs
 

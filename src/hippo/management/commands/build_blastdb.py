@@ -3,13 +3,14 @@ from hippo.models import Feature_Database
 import os
 import tempfile
 import subprocess
-from giraffe.features import clean_sequence, NCBI_BIN_DIR, NCBI_DAT_DIR, Blast_Accession
+from giraffe.features import clean_sequence, Blast_Accession
+from django.conf import settings
 
 
 class Command(BaseCommand):
   def handle(self, *args, **options):
     for feature_db in Feature_Database.objects.all():
-      print 'building %s using %s' % (feature_db.name, NCBI_BIN_DIR)
+      print 'building %s using %s' % (feature_db.name, settings.NCBI_BIN_DIR)
 
       infile = None
       with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
@@ -23,7 +24,7 @@ class Command(BaseCommand):
                    feature.name, data))
 
       cmd = "%s/makeblastdb -in %s -out %s/%s -title %s -dbtype nucl -parse_seqids -input_type fasta" % (
-              NCBI_BIN_DIR, infile, NCBI_DAT_DIR, feature_db.name, feature_db.name)
+              settings.NCBI_BIN_DIR, infile, settings.NCBI_DATA_DIR, feature_db.name, feature_db.name)
 
       r = subprocess.call(cmd.split(' '))
       if r != 0:

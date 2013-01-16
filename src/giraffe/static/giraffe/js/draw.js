@@ -4,7 +4,7 @@
  *              JSON plasmid feature data
  *
  * Copyright 2011 Addgene, Inc
- * Copyright 2012 Benjie Chen, Ginkgo Bioworks
+ * Copyright 2012, 2013 Benjie Chen, Ginkgo Bioworks
  *
  * @version 0.2
  * @author  Mikhail Wolfson (wolfsonm@mit.edu)
@@ -227,8 +227,12 @@ window.GiraffeDraw = function () {
 
         // Private data members, from the properties of the feature argument
         // since hash tables and objects are one and the same in js
-        var _name = feat.name;
-        var _label = feat.label;
+        var _name;
+        if (feat.name) { _name = feat.name; }
+        else if (feat.feature) { _name = feat.feature }
+        var _label;
+        if (feat.label) { _label = feat.label; }
+        else { _label = _name; }
         var _start = parseInt(feat.start, 10);
         var _end = parseInt(feat.end, 10);
         var _type = parseInt(feat.type_id, 10);
