@@ -1,19 +1,23 @@
 Sequence Feature Detection and Mapping
 --------------------------------------
 
-This software was originally written by Misha Wolfson and Benjie Chen,
-copyrighted by Addgene, and released under the MIT License. See LICENSE file.
-It is now maintained by Benjie Chen.
-
-The software is mostly divided into two parts: Giraffe and Hippo. Giraffe is a
+This software is mostly divided into two parts: Giraffe and Hippo. Giraffe is a
 set of Javascripts that visualize sequences and sequence features, as well as a
-Django/Python program to detect ORFs and features from a sequence. You can use
-the Javascripts independently from the Django program as well. Hippo is a
-Django/Python frontend for NCBI Blast.
+Django/Python program to detect ORFs, restriction sites, and features from a
+sequence. You can use the Javascripts independently from the Django program as
+well. Hippo is a Django/Python frontend for managing NCBI Blast databases.
 
 Hippo and Giraffe can be used together to construct database of sequence
 features, detect features in plasmid sequences, and visualize the features on a
 plasmid map.
+
+This is version 2 of the distribution, which is significantly different from
+version 1 in many ways. If you want version 1, checkout the v1.1 branch of the
+repository.
+
+This software was originally written by Misha Wolfson and Benjie Chen,
+copyrighted by Addgene, and released under the MIT License. See LICENSE file.
+It is now maintained by Benjie Chen.
 
 
 Giraffe - Visualization
@@ -24,8 +28,8 @@ directory. Also README file in src/giraffe/static/js describes how to use just
 the Javascript plasmid drawing widget.
 
 
-Giraffe - BLAST sequence feature detection
-------------------------------------------
+Giraffe - Sequence feature detection
+------------------------------------
 
 Requirements:
 
