@@ -1347,6 +1347,8 @@ window.GiraffeAnalyze = function ($,gd,options) {
           feature.alignment().match &&
           feature.alignment().subject) {
         if (feature.alignment().match.indexOf(' ') >= 0) {
+          $('<p><b>'+feature.name()+'</b></p>').appendTo('.giraffe-analyze-alignment');
+          var alignments = $('<div></div>');
           var al = feature.alignment();
           for (var i=0; i<al.query.length; i++) {
             var q = al.query[i];
@@ -1356,8 +1358,12 @@ window.GiraffeAnalyze = function ($,gd,options) {
             var s = al.subject[i];
             var a = $('<div class="giraffe-alignment-one giraffe-aligned'+m+'"></div>');
             $(a).append(q+'<br/>'+s);
-            $('.giraffe-analyze-alignment').append(a);
+            $(alignments).append(a);
           }
+          $('.giraffe-analyze-alignment').append(alignments);
+        }
+        else {
+          $('<p><b>'+feature.name()+'</b>: perfect alignment</p>').appendTo('.giraffe-analyze-alignment');
         }
       }
     }
@@ -1563,24 +1569,13 @@ window.GiraffeControl = function ($,gd_map,dom) {
     var controls,
         table,
         _debug = false,
-        draw_table,
-        draw_feature_controls,
         draw_enzyme_controls,
         num_explicit_cutters,
         control_feat_types,
         feat_control_table,
         ftx, ft;
 
-    draw_table = true;
     draw_enzyme_controls = true;
-    draw_feature_controls = true;
-    //XXX For now, we keep this hidden. Maybe we'll do something with it later.
-    draw_extra_features_checkbox = false;
-
-    if (gd_map.is_digest()) {
-        draw_table = false;
-        draw_feature_controls = false;
-    }
 
     controls = $('<form action="" class="giraffe-controls">' +
         '<fieldset><legend>Feature Options</legend><table><tbody class="giraffe-controls-layout"></tbody></table>' +
@@ -1625,23 +1620,6 @@ window.GiraffeControl = function ($,gd_map,dom) {
                 controls.find('input[name="non-cutters"]').attr("checked", "checked");
             }
 
-            if (draw_table) {
-                $('.giraffe-control-table').find('tr').each(function () {
-                    var fid = parseInt($(this).attr('id').replace(/\D/g, ''), 10);
-                    var feat = gd_map.gd.all_features[fid];
-                    if (typeof(feat) !== 'undefined' && feat.type() === gd_map.gd.Feature_Type.enzyme) {
-                        if (opts.indexOf(feat.cut_count()) >= 0) {
-                            $(this).find('input[value="show"]').attr("checked", "checked");
-                            $(this).find('input[value="label"]').removeAttr("disabled");
-                            $(this).find('input[value="label"]').attr("checked", "checked");
-                        } else {
-                            $(this).find('input[value="show"]').removeAttr("checked");
-                            $(this).find('input[value="label"]').attr("disabled", "disabled");
-                        }
-                    } 
-                });
-            }
-
             gd_map.redraw_cutters(opts);
         });
 
@@ -1654,139 +1632,6 @@ window.GiraffeControl = function ($,gd_map,dom) {
                 // When 'no cutters' is the only selected checkbox, make it impossible 
                 // to deselect by clicking on itself.
                 $(this).attr("checked", "checked");
-            }
-
-            if (draw_table) {
-                $('.giraffe-control-table').find('tr').each(function () {
-                    var fid = parseInt($(this).attr('id').replace(/\D/g, ''), 10);
-                    var feat = gd_map.gd.all_features[fid];
-                    if (typeof(feat) !== 'undefined' && feat.type() === gd_map.gd.Feature_Type.enzyme) {
-                        $(this).find('input[value="show"]').removeAttr("checked");
-                        $(this).find('input[value="label"]').attr("disabled", "disabled");
-                    } 
-                });
-            }
-        });
-    }
-    
-    if (draw_feature_controls) {
-        //                     Control name        feature type
-        control_feat_types = [["Generic features", "feature"],
-                              ["Genes",            "gene"],
-                              ["Regulatory",       "regulatory"],
-                              ["Promoters",        "promoter"],
-                              ["Primers",          "primer"],
-                              ["Terminators",      "terminator"],
-                              ["Origins",          "origin"],
-                              ["ORFs",             "orf"]];
-
-        feat_control_table = 
-            $('<tr><td class="features">' +
-              '<table><thead><tr><th>Show</th><th>Label</th><th>Feature Type</th></tr>' + 
-              '</thead><tbody></tbody></table></td></tr>')
-            .appendTo(controls.find('.giraffe-controls-layout'))
-            .find('tbody');
-
-        for (ftx = 0; ftx < control_feat_types.length; ftx++) {
-            feat_control_table.append(
-            '<tr class="' + control_feat_types[ftx][1] + '">' +
-                '<td><input type="checkbox" checked="checked"' +
-                     'name="all-' + control_feat_types[ftx][1] + '" value="show" />' +
-                '</td>' +
-                '<td><input type="checkbox" checked="checked"' +
-                     'name="all-' + control_feat_types[ftx][1] + '" value="label" />' +
-                '</td>' +
-                '<td>' +  control_feat_types[ftx][0] + '</td></tr>');
-        }
-
-        // Changes to the feature types
-        controls.find('td.features input[value="show"]').click(function (event) {
-            var feat_type_name,
-                label_checkbox;
-
-            feat_type_name = $(this).attr("name").replace(/all-/, '');
-            label_checkbox = $(this).parent().siblings().children().first();
-
-            if ($(this).attr("checked")) {
-                gd_map.show_feature_type(feat_type_name);
-                label_checkbox.removeAttr("disabled");
-                label_checkbox.attr("checked", "checked");
-
-                if (draw_table) {
-                    $('.giraffe-control-table').find('tr').each(function () {
-                        var fid = parseInt($(this).attr('id').replace(/\D/g, ''), 10);
-                        var feat = gd_map.gd.all_features[fid];
-                        if (typeof(feat) !== 'undefined' && feat.type() === gd_map.gd.Feature_Type[feat_type_name]) {
-                            $(this).find('input[value="show"]').attr("checked", "checked");
-                            $(this).find('input[value="label"]').removeAttr("disabled");
-                            $(this).find('input[value="label"]').attr("checked", "checked");
-                        }
-                    });
-                }
-
-            } else {
-                gd_map.hide_feature_type(feat_type_name);
-                label_checkbox.attr("disabled", "disabled");
-
-                if (draw_table) {
-                    $('.giraffe-control-table').find('tr').each(function () {
-                        var fid = parseInt($(this).attr('id').replace(/\D/g, ''), 10);
-                        var feat = gd_map.gd.all_features[fid];
-                        if (typeof(feat) !== 'undefined' && feat.type() === gd_map.gd.Feature_Type[feat_type_name]) {
-                            $(this).find('input[value="show"]').removeAttr("checked");
-                            $(this).find('input[value="label"]').attr("disabled", "disabled");
-                        }
-                    });
-                }
-
-            }
-        });
-
-        controls.find('td.features input[value="label"]').click(function (event) {
-            var feat_type_name = $(this).attr("name").replace(/all-/, '');
-
-            if ($(this).attr("checked")) {
-                gd_map.show_feature_label_type(feat_type_name);
-
-                if (draw_table) {
-                    $('.giraffe-control-table').find('tr').each(function () {
-                        var fid = parseInt($(this).attr('id').replace(/\D/g, ''), 10);
-                        var feat = gd_map.gd.all_features[fid];
-                        if (typeof(feat) !== 'undefined' && feat.type() === gd_map.gd.Feature_Type[feat_type_name]) {
-                            $(this).find('input[value="label"]').attr("checked", "checked");
-                        }
-                    });
-                }
-
-            } else {
-                gd_map.hide_feature_label_type(feat_type_name);
-
-                if (draw_table) {
-                    $('.giraffe-control-table').find('tr').each(function () {
-                        var fid = parseInt($(this).attr('id').replace(/\D/g, ''), 10);
-                        var feat = gd_map.gd.all_features[fid];
-                        if (typeof(feat) !== 'undefined' && feat.type() === gd_map.gd.Feature_Type[feat_type_name]) {
-                            $(this).find('input[value="label"]').removeAttr("checked");
-                        }
-                    });
-                }
-
-            }
-        });
-
-    }
-
-    if (draw_extra_features_checkbox) {
-        controls.children('fieldset')
-            .append('<label><input type="checkbox" name="extra-features" value="show" />' +
-                    'Show extra features</label>');
-
-        // The "extra features" checkbox
-        controls.find('input[name="extra-features"]').click(function (event) {
-            if ($(this).attr("checked")) {
-                gd_map.show_extra_features();
-            } else {
-                gd_map.hide_extra_features();
             }
         });
     }
@@ -1869,11 +1714,6 @@ window.GiraffeControl = function ($,gd_map,dom) {
         });
 
         return the_table;
-    }
-
-    if (draw_table) {
-        table = GiraffeControlTable();
-        controls.append(table);
     }
 
     $(dom).append(controls);

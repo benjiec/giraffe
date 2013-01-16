@@ -151,14 +151,16 @@ body .ui-tooltip { border-width:2px; }
 }
 
 .giraffe-analyze-alignment {
-	font-family: courier;
-	font-size: 12px;
-	margin-bottom: 15px;
+	margin-bottom: 30px;
 }
 
 .giraffe-aligned { background-color: #ddffdd; }
 .giraffe-alignedx { background-color: #ffaaaa; }
 
-.giraffe-alignment-one { display: inline-block; margin-bottom: 8px; }
+.giraffe-alignment-one {
+	display: inline-block; margin-bottom: 8px;
+	font-family: courier;
+	font-size: 12px;
+}
 
 

@@ -5,7 +5,7 @@ How to get enzymes?
 How to use widget embedded
   - Add JS helper to initial POST
   - How to add additional features to list of features
-  - Visible/not visible change to layers, not type of features
+  - Make layers visible and not visible
 
 Handle degenerates, etc.
 
@@ -16,6 +16,7 @@ UI/Trigger to compile blast DB
 Add tests
   - Orf detection
   - Cutter detection
+  - JS expects alignment match to include | for match, empty space for mismatch
   - JS test to show we list in frame tags with ORF
   - JS test linear mode specifies circular boundary ORFs
 
