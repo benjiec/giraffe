@@ -1342,17 +1342,22 @@ window.GiraffeAnalyze = function ($,gd,options) {
 
     function show_alignment(feature) {
       $('.giraffe-analyze-alignment').empty();
-      if (feature.alignment() && feature.alignment().query && feature.alignment().match && feature.alignment().subject) {
-        var al = feature.alignment();
-        for (var i=0; i<al.query.length; i++) {
-          var q = al.query[i];
-          var m = al.match[i];
-          if (m == '|') { m = ''; }
-          else { m = 'x'; }
-          var s = al.subject[i];
-          var a = $('<div class="giraffe-alignment-one giraffe-aligned'+m+'"></div>');
-          $(a).append(q+'<br/>'+s);
-          $('.giraffe-analyze-alignment').append(a);
+      if (feature.alignment() &&
+          feature.alignment().query &&
+          feature.alignment().match &&
+          feature.alignment().subject) {
+        if (feature.alignment().match.indexOf(' ') >= 0) {
+          var al = feature.alignment();
+          for (var i=0; i<al.query.length; i++) {
+            var q = al.query[i];
+            var m = al.match[i];
+            if (m == '|') { m = ''; }
+            else { m = 'x'; }
+            var s = al.subject[i];
+            var a = $('<div class="giraffe-alignment-one giraffe-aligned'+m+'"></div>');
+            $(a).append(q+'<br/>'+s);
+            $('.giraffe-analyze-alignment').append(a);
+          }
         }
       }
     }
