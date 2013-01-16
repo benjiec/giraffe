@@ -13,6 +13,10 @@ Add tests
   - JS test to show we list in frame tags with ORF
   - JS test linear mode specifies circular boundary ORFs
 
+Add examples
+  - Ajax POST
+  - Layers
+
 Show alignment part is slow; can we optimize this?
 
 Create arbitrary blast DB
