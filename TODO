@@ -1,14 +1,12 @@
 
+Handle degenerates, etc.
+
 How to use widget embedded
   - Add JS helper to initial POST
   - How to add additional features to list of features
   - Make layers visible and not visible
 
-Handle degenerates, etc.
-
 Script/example for creating blast DB
-
-UI/Trigger to compile blast DB
 
 Add tests
   - Orf detection

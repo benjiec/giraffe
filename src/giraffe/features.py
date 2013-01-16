@@ -178,6 +178,10 @@ def blast(sequence, db):
         #print '    '+hsp.match[0:75] + '...'
         #print '    '+hsp.sbjct[0:75] + '...'
 
+        percent = 100.0*hsp.identities/(1.0*len(hsp.sbjct))
+        if percent < 85: # this is some what arbitrary...
+          continue
+
         start = hsp.query_start
         end = hsp.query_end
         if hsp.sbjct_end > hsp.sbjct_start:
