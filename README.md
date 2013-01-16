@@ -43,18 +43,18 @@ Requirements:
 
 Install Django service and build default database:
 
-'''
+```
 git clone git@github.com:benjiec/giraffe.git
 cd giraffe
 (cd src; python manage.py migrate)
 (cd src; python manage.py build_blastdb)
-'''
+```
 
 Run test server:
 
-'''
+```
 cd src; python manage.py runserver 0.0.0.0:8000
-'''
+```
 
 Then goto http://0.0.0.0:8000/giraffe/demo/
 
@@ -64,9 +64,9 @@ API
 
 You can POST a sequence to "/hippo/", with the following params:
 
-'''
+```
 db=default&sequence=your_dna_sequence_here
-'''
+```
 
 This will return a JSON array of [sequence_len, array of features, sequence].
 
