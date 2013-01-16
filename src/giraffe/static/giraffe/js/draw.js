@@ -237,6 +237,8 @@ window.GiraffeDraw = function () {
         var _end = parseInt(feat.end, 10);
         var _type = parseInt(feat.type_id, 10);
         var _default_show_feature = 1;
+        var _alignment = undefined;
+        if (feat.alignment) { _alignment = feat.alignment; }
         // Not all features have this option, e.g. annotated ones we
         // have to show the feature.
         if ('show_feature' in feat) {
@@ -261,6 +263,7 @@ window.GiraffeDraw = function () {
         this.actually_have_cut = function() {
             return _type == ft.enzyme ? (_cut ? true : false) : false;
         };
+        this.alignment = function() { return _alignment; }
 
         this.is_enzyme = function() { return _type == ft.enzyme; };
         this.is_orf = function() { return _type == ft.orf; };

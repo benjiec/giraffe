@@ -1,7 +1,5 @@
 Report mutations
 
-Analyzer - line wrap sequence tab using CSS
-
 How to get enzymes?
 
 ---
@@ -22,4 +20,9 @@ Add tests
   - Cutter detection
   - JS test to show we list in frame tags with ORF
   - JS test linear mode specifies circular boundary ORFs
+
+Blast API
+  - Return in order of escore
+  - Getting word_size from params
+  - Need UI widget?
 

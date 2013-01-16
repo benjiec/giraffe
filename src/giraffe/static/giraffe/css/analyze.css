@@ -150,3 +150,15 @@ body .ui-tooltip { border-width:2px; }
 	width: 265px;
 }
 
+.giraffe-analyze-alignment {
+	font-family: courier;
+	font-size: 12px;
+	margin-bottom: 15px;
+}
+
+.giraffe-aligned { background-color: #ddffdd; }
+.giraffe-alignedx { background-color: #ffaaaa; }
+
+.giraffe-alignment-one { display: inline-block; margin-bottom: 8px; }
+
+

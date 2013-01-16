@@ -265,10 +265,12 @@ window.GiraffeAnalyze = function ($,gd,options) {
         var help, // DOMs
             dom_map_id_c = random_dom_id(), 
             dom_map_c,
+            dom_align_c,
             dom_control_id_c = random_dom_id(), 
             dom_control_c,
             dom_map_id_l = random_dom_id(), 
             dom_map_l,
+            dom_align_l,
             dom_control_id_l = random_dom_id(), 
             dom_control_l,
             gt, gd_c, gd_l, gc_c, gc_l; // GriaffeDraw/Table/Controls
@@ -289,9 +291,11 @@ window.GiraffeAnalyze = function ($,gd,options) {
 
         // Circular map pane
         dom_map_c = $('<div id="'+dom_map_id_c+'" class="giraffe-analyze-map giraffe-analyze-circular-map"></div>');
+        dom_align_c = $('<div class="giraffe-analyze-alignment"></div>');
         dom_control_c = $('<div id="' + dom_control_id_c + '" class="giraffe-analyze-map-control"></div>');
         $(panes.pane(0))
             .append(dom_map_c)
+            .append(dom_align_c)
             .append(dom_control_c);
 
         gd_c = gd.CircularMap({
@@ -306,9 +310,11 @@ window.GiraffeAnalyze = function ($,gd,options) {
 
         // Linear map pane
         dom_map_l = $('<div id="'+dom_map_id_l+'" class="giraffe-analyze-map giraffe-analyze-linear-map"></div>');
+        dom_align_l = $('<div class="giraffe-analyze-alignment"></div>');
         dom_control_l = $('<div id="' + dom_control_id_c + '" class="giraffe-analyze-map-control"></div>');
         $(panes.pane(1))
             .append(dom_map_l)
+            .append(dom_align_l)
             .append(dom_control_l);
 
         gd_l = gd.LinearMap({
@@ -331,8 +337,6 @@ window.GiraffeAnalyze = function ($,gd,options) {
         sequence_viewer_bp_event(dom);
     }
 
-
-
     function digest_tab(dom) {
 
         var map_objects = new Array(2);
@@ -342,9 +346,11 @@ window.GiraffeAnalyze = function ($,gd,options) {
             var cpanes,
                 dom_map_c,
                 dom_map_id_c = random_dom_id(),
+                dom_align_c,
                 dom_control_c,
                 dom_map_l,
                 dom_map_id_l = random_dom_id(),
+                dom_align_l,
                 dom_control_l,
                 circular_digest_map_shrink_factor = 1;
 
@@ -356,9 +362,11 @@ window.GiraffeAnalyze = function ($,gd,options) {
 
             // Linear digest pane
             dom_map_l = $('<div id="'+ dom_map_id_l+'" class="giraffe-analyze-map giraffe-analyze-linear-map giraffe-digest-map"></div>');
+            dom_align_l = $('<div class="giraffe-analyze-alignment"></div>');
             dom_control_l = $('<div id="' + random_dom_id()  + '" class="giraffe-analyze-map-control giraffe-digest-control"></div>');
             $(cpanes.pane(0))
                 .append(dom_map_l)
+                .append(dom_align_l)
                 .append(dom_control_l);
 
             gd_l = gd.LinearMap({
@@ -376,9 +384,11 @@ window.GiraffeAnalyze = function ($,gd,options) {
 
             // Circular digest pane
             dom_map_c = $('<div id="'+ dom_map_id_c+'" class="giraffe-analyze-map giraffe-analyze-circular-map giraffe-digest-map"></div>');
+            dom_align_c = $('<div class="giraffe-analyze-alignment"></div>');
             dom_control_c = $('<div id="' + random_dom_id()  + '" class="giraffe-analyze-map-control giraffe-digest-control"></div>');
             $(cpanes.pane(1))
                 .append(dom_map_c)
+                .append(dom_align_c)
                 .append(dom_control_c);
 
             gd_c = gd.CircularMap({
@@ -1330,6 +1340,23 @@ window.GiraffeAnalyze = function ($,gd,options) {
         $('.giraffe-seq-viewer').scrollTop(scroll);
     }
 
+    function show_alignment(feature) {
+      $('.giraffe-analyze-alignment').empty();
+      if (feature.alignment() && feature.alignment().query && feature.alignment().match && feature.alignment().subject) {
+        var al = feature.alignment();
+        for (var i=0; i<al.query.length; i++) {
+          var q = al.query[i];
+          var m = al.match[i];
+          if (m == '|') { m = ''; }
+          else { m = 'x'; }
+          var s = al.subject[i];
+          var a = $('<div class="giraffe-alignment-one giraffe-aligned'+m+'"></div>');
+          $(a).append(q+'<br/>'+s);
+          $('.giraffe-analyze-alignment').append(a);
+        }
+      }
+    }
+
     function map_feature_click_callback(feature) {
         var bp; // Start and end of feature
         var name = feature.name(); // Tag to display
@@ -1352,6 +1379,7 @@ window.GiraffeAnalyze = function ($,gd,options) {
         }
 
         sequence_viewer_bp_event_highlight(bp,name);
+        show_alignment(feature);
     }
 
     function full_widget() {
