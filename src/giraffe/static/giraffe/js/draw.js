@@ -149,8 +149,6 @@ window.GiraffeDraw = function () {
         enzyme_features = [],
         std_features = [];
 
-
-    // XXX hack to provide link to GiraffeDraw to the map functions.
     var gd = this;
 
     ///////////////////////////////////////////////////////////////////
@@ -236,14 +234,12 @@ window.GiraffeDraw = function () {
         var _start = parseInt(feat.start, 10);
         var _end = parseInt(feat.end, 10);
         var _type = parseInt(feat.type_id, 10);
-        var _default_show_feature = 1;
+        var _layer = 'Default';
+        if (feat.layer) { _layer = feat.layer; }
         var _alignment = undefined;
         if (feat.alignment) { _alignment = feat.alignment; }
         // Not all features have this option, e.g. annotated ones we
         // have to show the feature.
-        if ('show_feature' in feat) {
-            _default_show_feature = parseInt(feat.show_feature, 10);
-        }
         var _clockwise = feat.clockwise;
         var _elucidate; // only for enzymes
         if (feat.elucidate) { _elucidate = feat.elucidate; }
@@ -252,6 +248,7 @@ window.GiraffeDraw = function () {
         var _id = Feature.nfeat;
 
         // Accessors for private properties set at creation
+        this.layer = function() { return _layer; };
         this.label = function() { return _label; };
         this.name = function() { return _name; };
         this.start = function() { return _start; };
@@ -259,7 +256,6 @@ window.GiraffeDraw = function () {
         this.length = function() { return _end < _start ? _end+seq_length-_start+1 : _end-_start+1; }
         this.type = function() { return _type; };
         this.clockwise = function() { return _clockwise; };
-        this.default_show_feature = function() { return _default_show_feature; };
         // returns - 1 if not enzyme
         this.cut = function() { return _type == ft.enzyme ? (_cut ? _cut : _start) : -1; };
         this.elucidate = function() { return _elucidate; }
@@ -459,6 +455,10 @@ window.GiraffeDraw = function () {
 
         // Showing and hiding
 
+        thi$.is_visible = function () {
+          if (this.visible) { return true; } else { return false; }
+        }
+
         thi$.hide = function () {
             if (this.visible) {
                 if (this.feature_set) { this.feature_set.hide(); }
@@ -626,8 +626,6 @@ window.GiraffeDraw = function () {
             thi$.label_offset = 0;
 
             thi$.features = [];
-            thi$.show_all_features = false;
-
             thi$.width = 800;
             thi$.height = 800;
 
@@ -695,30 +693,23 @@ window.GiraffeDraw = function () {
         // Make sure that the appropriate cutters are shown
         thi$.show_hide_cutters = function () {
             var fx, f;
-
             for (fx = 0; fx< this.features.length; fx++) {
                 f = this.features[fx];
-                if (f.default_show_feature() || this.show_all_features) {
-                    // Only draw enzymes if they are in the list of
-                    // cutters to show - i.e. 1 cutter, 2 cutters,
-                    // etc.
-                    // If the list is undefined, draw all cutters
-                    if (f.type() == ft.enzyme) {
-                        if (typeof(_cutters_to_show) !== 'undefined' &&
-                            _cutters_to_show.indexOf(f.cut_count()) < 0) {
-                            f.hide();
-                            f.clear_label();
-                        } else {
-                            f.show();
-                            f.show_label();
-                        }
+                // Only draw enzymes if they are in the list of
+                // cutters to show - i.e. 1 cutter, 2 cutters,
+                // etc.
+                // If the list is undefined, draw all cutters
+                if (f.type() == ft.enzyme) {
+                  if (f.is_visible()) {
+                    if (typeof(_cutters_to_show) !== 'undefined' &&
+                        _cutters_to_show.indexOf(f.cut_count()) < 0) {
+                        f.hide();
+                        f.clear_label();
+                    } else {
+                        f.show();
+                        f.show_label();
                     }
-                }
-                else {
-                    // If the enzyme is not set to be shown by
-                    // default, don't show it
-                    f.hide();
-                    f.clear_label();
+                  }
                 }
             }
         };
@@ -732,16 +723,6 @@ window.GiraffeDraw = function () {
                 _cutters_to_show = [];
             }
             this.redraw(false);
-        };
-
-        thi$.show_extra_features = function () {
-            this.show_all_features = true;
-            this.redraw(true);
-        };
-
-        thi$.hide_extra_features = function () {
-            this.show_all_features = false;
-            this.redraw(true);
         };
 
         // any number of arguments will work. accessed via arguments object
@@ -770,6 +751,26 @@ window.GiraffeDraw = function () {
         thi$.hide_feature_label_type = apply_to_feature_type(false, "hide_label");
 
         // any number of arguments will work. accessed via arguments object
+        function apply_to_feature_layer(recalc) {
+            var funcs_to_call = arguments;
+            return (function (layer_name) {
+                var fx, ax;
+                for (fx = 0; fx < this.features.length; fx++) {
+                    if (this.features[fx].layer() == layer_name) {
+                        // All arguments after the first are functions to call
+                        for (ax = 1; ax < funcs_to_call.length; ax++) {
+                            this.features[fx][funcs_to_call[ax]]();
+                        }
+                    }
+                }
+                this.redraw(recalc);
+            });
+        }
+
+        thi$.hide_feature_layer = apply_to_feature_layer(true, "hide", "hide_label");
+        thi$.show_feature_layer = apply_to_feature_layer(true, "show", "show_label");
+
+        // any number of arguments will work. accessed via arguments object
         function apply_to_feature() {
             var funcs_to_call = arguments;
 
@@ -789,10 +790,8 @@ window.GiraffeDraw = function () {
         thi$.show_feature_label = apply_to_feature("show_label");
         thi$.hide_feature_label = apply_to_feature("hide_label");
 
-
         thi$.draw_features = function () {
             var fx;
-
             for (fx = 0; fx < this.features.length; fx++) {
                 this.features[fx].draw();
             }
@@ -802,7 +801,6 @@ window.GiraffeDraw = function () {
             // Extend basic features to get list of circular features:
             // do this only once, the first time the map is created.
             this.extend_features();
-
             this.update(true);
         };
 
@@ -882,6 +880,8 @@ window.GiraffeDraw = function () {
             // this pointer, will return /Their own/ draw and features objects
             return {
                 redraw_cutters: this.redraw_cutters.bind(this),
+                show_feature_layer: this.show_feature_layer.bind(this),
+                hide_feature_layer: this.hide_feature_layer.bind(this),
                 show_feature_type: this.show_feature_type.bind(this),
                 hide_feature_type: this.hide_feature_type.bind(this),
                 show_feature_label_type: this.show_feature_label_type.bind(this),
@@ -890,8 +890,6 @@ window.GiraffeDraw = function () {
                 hide_feature: this.hide_feature.bind(this),
                 show_feature_label: this.show_feature_label.bind(this),
                 hide_feature_label: this.hide_feature_label.bind(this),
-                show_extra_features: this.show_extra_features.bind(this),
-                hide_extra_features: this.hide_extra_features.bind(this),
                 is_digest: this.is_digest,
                 gd: gd
             };

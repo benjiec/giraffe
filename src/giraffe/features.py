@@ -95,6 +95,7 @@ class Detected_Feature_Base(object):
     self.end = end
     self.clockwise = clockwise
     self.type = type
+    self.layer = 'Detected Features'
     if type not in Feature_Type_Choices.labels():
       raise Exception("Invalid type: %s" % (type,))
 
@@ -103,6 +104,7 @@ class Detected_Feature_Base(object):
     return dict(start=self.start,
                 end=self.end,
                 clockwise=self.clockwise,
+                layer=self.layer,
                 label=self.label,
                 name=self.name,
                 type_id=t[0],
@@ -222,6 +224,7 @@ class Restriction_Site(Detected_Feature_Base):
     super(Restriction_Site, self).__init__(name, name, start, end, clockwise, Feature_Type_Choices.ENZYME[1])
     self.enzyme = enzyme
     self.cut = cut
+    self.layer = 'Restriction Enzymes'
 
   def to_dict(self):
     r = super(Restriction_Site, self).to_dict()

@@ -9,10 +9,3 @@ urlpatterns = patterns('',
     (r'^giraffe/', include('giraffe.urls')),
 )
 
-if settings.DEBUG:
-  urlpatterns += patterns('',
-    url(r'^files/(?P<path>.*)$', 'django.views.static.serve', {
-      'document_root': settings.MEDIA_ROOT,
-    }),
-  )
-

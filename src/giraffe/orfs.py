@@ -12,6 +12,7 @@ class Orf(Detected_Feature_Base):
   def __init__(self, name, start, end, clockwise, orf_frame=None):
     super(Orf, self).__init__(name, name, start, end, clockwise, Feature_Type_Choices.ORF[1])
     self.orf_frame = orf_frame
+    self.layer = 'ORFs'
 
   def to_dict(self):
     r = super(Orf, self).to_dict()

@@ -1,10 +1,8 @@
 
 How to use widget embedded
-  - How to add additional features to list of features
-  - Make layers visible and not visible
   - Add JS helper to initial POST
 
-Script/example for creating blast DB
+Drawing bug - multiple labels highlighted on mouse over
 
 Add tests
   - Allow GATCRYWSMKHBVDN
@@ -17,10 +15,16 @@ Add tests
 
 Show alignment part is slow; can we optimize this?
 
+Create arbitrary blast DB
+  - Script/example for creating blast DB
+  - How to add links to blast results?
+
 Blast API
   - Return in order of escore
   - Getting word_size from params
   - Need UI widget?
+
+Customize alayzer widget BLAST button - add custom blast buttons
 
 Add back non-cutters analysis, but have to pass this in from backend
 

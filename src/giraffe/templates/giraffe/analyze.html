@@ -133,18 +133,45 @@ tttggccgcggctcgaggggg
 {% block pagejs %}
 <script>
 
-jQuery(document).ready(function($){ 
+jQuery(document).ready(function($){
   $('#post-form .button a').click(function(evt){
     evt.preventDefault();
+    var analyzer_dom_id = 'giraffe-analyze';
+    $('#'+analyzer_dom_id).empty();
+
     var seq = $('#post-form textarea[name=sequence]').val();
+    seq = seq.replace(/\s+/g,'');
     var db = $('#post-form input[name=db]').val();
     if (seq !== undefined && seq.length > 0) {
+      var gd = GiraffeDraw();
+      var data0 = [seq.length,
+                   [{ "show_feature": 1,
+                      "start": 100,
+                      "end": 1000,
+                      "feature": "Test",
+                      "type_id": 1,
+                      "clockwise": true,
+                      "layer": "Split1"
+                    }],
+                   seq];
+      gd.read(data0);
+      var analyzer = GiraffeAnalyze($, gd, { 'dom_id': analyzer_dom_id, 'name': 'Sequence' });
+
       $.post("{% url blat-post %}",
              { "sequence": seq, "db": db },
              function(data) {
+               if (data[2] != data0[2]) {
+                 alert("Opps, cannot use original features because sequence has been changed by Giraffe");
+               }
+               else {
+                 for (var i=0; i<data0[1].length; i++) {
+                   data[1].push(data0[1][i]);
+                 }
+               }
                var gd = GiraffeDraw();
                gd.read(data);
-               GiraffeAnalyze($, gd, { 'dom_id':'giraffe-analyze', 'name':'Sequence' });
+               $('#'+analyzer_dom_id).empty();
+               analyzer = GiraffeAnalyze($, gd, { 'dom_id': analyzer_dom_id, 'name': 'Sequence' });
              },
              'json');
       return;

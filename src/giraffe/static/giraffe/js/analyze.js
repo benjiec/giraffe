@@ -262,7 +262,7 @@ window.GiraffeAnalyze = function ($,gd,options) {
             'map_height' : map_height,
             'feature_click_callback' : map_feature_click_callback
         });
-        gc_c = GiraffeControl($, gd_c, dom_control_c);
+        gc_c = GiraffeControl($, gd_c, dom_control_c, gd);
 
         // Linear map pane
         dom_map_l = $('<div id="'+dom_map_id_l+'" class="giraffe-analyze-map giraffe-analyze-linear-map"></div>');
@@ -281,7 +281,7 @@ window.GiraffeAnalyze = function ($,gd,options) {
             'map_height' : map_height,
             'feature_click_callback' : map_feature_click_callback
         });
-        gc_l = GiraffeControl($, gd_l, dom_control_l);
+        gc_l = GiraffeControl($, gd_l, dom_control_l, gd);
 
         panes.hide_all();
         if (starts_with_linear_map) { panes.show(1); }
@@ -334,8 +334,7 @@ window.GiraffeAnalyze = function ($,gd,options) {
                 'map_height' : map_height,
                 'feature_click_callback' : map_feature_click_callback
             });
-            gd_l.show_extra_features();
-            gc_l = GiraffeControl($, gd_l, dom_control_l);
+            gc_l = GiraffeControl($, gd_l, dom_control_l, gd);
             map_objects[0] = gd_l;
 
             // Circular digest pane
@@ -356,8 +355,7 @@ window.GiraffeAnalyze = function ($,gd,options) {
                 'map_height' : map_height * circular_digest_map_shrink_factor,
                 'feature_click_callback' : map_feature_click_callback
             });
-            gd_c.show_extra_features();
-            gc_c = GiraffeControl($, gd_c, dom_control_c);
+            gc_c = GiraffeControl($, gd_c, dom_control_c, gd);
             map_objects[1] = gd_c;
 
             // Show the linear map by default
@@ -1489,17 +1487,19 @@ window.GiraffeTable = function ($,gd,dom) {
     return $(dom);
 };
 
-window.GiraffeControl = function ($,gd_map,dom) {   
+window.GiraffeControl = function ($,gd_map,dom,gd) {
     var controls,
         table,
         _debug = false,
         draw_enzyme_controls,
+        draw_layer_controls,
         num_explicit_cutters,
         control_feat_types,
         feat_control_table,
         ftx, ft;
 
     draw_enzyme_controls = true;
+    draw_layer_controls = true;
 
     controls = $('<form action="" class="giraffe-controls">' +
         '<fieldset><legend>Feature Options</legend><table><tbody class="giraffe-controls-layout"></tbody></table>' +
@@ -1538,84 +1538,41 @@ window.GiraffeControl = function ($,gd_map,dom) {
         });
     }
 
-    function GiraffeControlTable() {
-        var the_table;
+    if (draw_layer_controls) {
+        // Get list of layers
+        layers = [];
+        for (var i = 0; i < gd.all_features.length; i++) {
+          layer = gd.all_features[i].layer();
+          if (layers.indexOf(layer) < 0) { layers.push (layer); }
+        }
 
-        // INDIVIDUAL FEATURE TABLE
-        the_table = GiraffeTable($, gd_map.gd, 
-            $('<div></div>')
-                .attr('id', random_dom_id())
-                .addClass('giraffe-control-table'));
+        layer_control_table = 
+            $('<tr><td class="layers">' +
+              '<table><thead><tr><th>Show</th><th>Layer</th></tr>' + 
+              '</thead><tbody></tbody></table></td></tr>')
+            .appendTo(controls.find('.giraffe-controls-layout'))
+            .find('tbody');
 
-        the_table.find('colgroup')
-            .prepend('<col class="giraffe-table-feature-show"  />' +
-                     '<col class="giraffe-table-feature-label" />');
+        for (li = 0; li < layers.length; li++) {
+            layer_control_table.append(
+            '<tr>'+
+                '<td><input type="checkbox" checked="checked"' +
+                     'data-layer="' + layers[li] + '" value="show" />' +
+                '</td>' +
+                '<td>' +  layers[li] + '</td></tr>');
+        }
 
-        // Insert header cells in all of the headers to make
-        // the tables the right shape
-        the_table.find('thead>tr')
-            .prepend('<th>Show Feature</th>' +
-                     '<th>Label Feature</th>');
-
-        // Insert show/label checkboxes in all of the body rows
-        the_table.find('tbody>tr')
-            .each(function (index, html) {
-                // Added in reverse, because of prepend
-                var types = [ 'label', 'show' ], tx;
-
-                for (tx = 0; tx < types.length; tx++) {
-                    var foo = $('<td></td>')
-                        .append($('<input type="checkbox" checked="checked" />')
-                            .attr('value', types[tx])
-                            .attr('name', $(this).attr('id')))
-                        .prependTo(this);
-                }
-
-            });
-                    
-        // The table checkboxes
-        the_table.find('input[value="label"]').click(function (event) {
-            var feat_id = parseInt($(this).attr("name").replace(/\D/g, ''), 10);
+        // Changes to the feature types
+        controls.find('td.layers input[value="show"]').click(function (event) {
+            var layer_name;
+            layer_name = $(this).attr("data-layer");
 
             if ($(this).attr("checked")) {
-                gd_map.show_feature_label(feat_id);
+                gd_map.show_feature_layer(layer_name);
             } else {
-                gd_map.hide_feature_label(feat_id);
+                gd_map.hide_feature_layer(layer_name);
             }
         });
-
-        the_table.find('input[value="show"]').click(function (event) {
-            var feat_id = parseInt($(this).attr("name").replace(/\D/g, ''), 10),
-                label_checkbox = $(this).parent().siblings().children('input').first();
-
-            if ($(this).attr("checked")) {
-                gd_map.show_feature(feat_id);
-                label_checkbox.removeAttr("disabled");
-                label_checkbox.attr("checked", "checked");
-            } else {
-                label_checkbox.attr("disabled", "disabled");
-                gd_map.hide_feature(feat_id);
-            }
-        });
-
-        // Make the names in the table function as links instead
-        the_table.find('td.giraffe-table-feature-name').each(function() {
-            var nonnum = new RegExp('\\D', 'g'),
-                id = parseInt($(this)
-                                .closest('tr')
-                                .attr('id').replace(nonnum, ''), 10),
-                f = gd_map.gd.all_features[id];
-
-            $(this)
-                .empty()
-                .append($('<a></a>').text(f.name())
-                .attr('href', '#')
-                .attr('seq-title', f.name())
-                .attr('bp', 'feature-' + id)
-                .addClass('giraffe-bp'));
-        });
-
-        return the_table;
     }
 
     $(dom).append(controls);
