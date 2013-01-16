@@ -19,12 +19,6 @@ class FeatureAdmin(admin.ModelAdmin):
     list_filter = ('type',)
     search_fields = ('name',)
 
-    def has_delete_permission(self, *args, **kwargs):
-      return False
-
-    def delete_view(self, request, object_id, extra_context=None):
-        raise PermissionDenied
-
 admin.site.register(models.Feature, FeatureAdmin)
 
 
