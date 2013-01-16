@@ -16,10 +16,10 @@
 //
 //
 // Call:
-//    GiraffeAnalyze(jQuery,gd,{...});
+//    GiraffeAnalyze2(jQuery,gd,{...});
 //  or
 //    jQuery(document).ready(function($){
-//        GiraffeAnalyze($,gd,{...});
+//        GiraffeAnalyze2($,gd,{...});
 //    })
 //
 // Options:
@@ -37,7 +37,7 @@ function random_dom_id() {
     return 'giraffe-'+Math.floor(Math.random()*100000000);
 }
 
-window.GiraffeAnalyze = function ($,gd,options) {
+window.GiraffeAnalyze2 = function ($,gd,options) {
     var dom_id = 'giraffe-analyze';
     if ('dom_id' in options) { dom_id = options.dom_id; }
     var name = 'Sequence';
@@ -54,7 +54,7 @@ window.GiraffeAnalyze = function ($,gd,options) {
     var viewer_segs_per_line = 5;
 
     var seqlen = gd.sequence.length;
-    var sequence = new BioJS.DNASequence(gd.sequence);
+    var sequence = new BioJS2.DNASequence(gd.sequence);
     var cutters = new Cutter_List(gd.enzyme_features);
 
     function Switch_Panes(panes) {
@@ -163,7 +163,7 @@ window.GiraffeAnalyze = function ($,gd,options) {
             .append('<p>'+copy_all+'</p>')
             .append($('<textarea readonly></textarea>')
                         .addClass('giraffe-seq-textarea')
-                        .val(BioJS.fasta(sequence,name,false)));
+                        .val(BioJS2.fasta(sequence,name,false)));
 
         var features = [];
         for (var i = 0; i < gd.all_features.length; i++) {
@@ -203,13 +203,13 @@ window.GiraffeAnalyze = function ($,gd,options) {
             .append('<p>'+copy_all+'</p>')
             .append($('<textarea readonly></textarea>')
                         .addClass('giraffe-seq-textarea')
-                        .val(BioJS.genbank(sequence,name,false,features)));
+                        .val(BioJS2.genbank(sequence,name,false,features)));
 
         $(panes.pane(2))
             .append('<p>'+copy_all+'</p>')
             .append($('<textarea readonly></textarea>')
                         .addClass('giraffe-seq-textarea')
-                        .val(BioJS.fasta(sequence.reverse_complement(),name,false)));
+                        .val(BioJS2.fasta(sequence.reverse_complement(),name,false)));
 
         panes.hide_all();
         panes.show(0);
@@ -711,13 +711,13 @@ window.GiraffeAnalyze = function ($,gd,options) {
             s = f.clockwise_sequence();
 
             if (f.clockwise()) {
-                s = new BioJS.DNASequence(s);
+                s = new BioJS2.DNASequence(s);
                 p = s.translate();
                 seq_start = f.start();
                 seq_end = f.end();
             }
             else {
-                s = new BioJS.DNASequence(s).reverse_complement();
+                s = new BioJS2.DNASequence(s).reverse_complement();
                 p = s.translate();
                 seq_start = f.end();
                 seq_end = f.start();
@@ -754,7 +754,7 @@ window.GiraffeAnalyze = function ($,gd,options) {
                             )
                             .append(
                                 $('<div></div>')
-                                    .append($(BioJS.NCBI_blastp_form(p)))
+                                    .append($(BioJS2.NCBI_blastp_form(p)))
                                     .addClass('giraffe-ncbi-button')
                                     .addClass('giraffe-left')
                                     .addClass('giraffe-left-last')
@@ -775,7 +775,7 @@ window.GiraffeAnalyze = function ($,gd,options) {
                             .addClass('giraffe-protein')
                             .append(overlay_switch.panes)
         ).append(
-            $(BioJS.NCBI_blastp_form(p))
+            $(BioJS2.NCBI_blastp_form(p))
                 .addClass('giraffe-left')
                 .addClass('giraffe-left-last')
         );
@@ -793,7 +793,7 @@ window.GiraffeAnalyze = function ($,gd,options) {
                             .addClass('giraffe-protein')
                             .append(overlay_switch.panes)
         ).append(
-            $(BioJS.NCBI_blastp_form(p))
+            $(BioJS2.NCBI_blastp_form(p))
                 .addClass('giraffe-left')
                 .addClass('giraffe-left-last')
         );
@@ -811,7 +811,7 @@ window.GiraffeAnalyze = function ($,gd,options) {
                             .addClass('giraffe-protein')
                             .append(overlay_switch.panes)
         ).append(
-            $(BioJS.NCBI_blastp_form(p))
+            $(BioJS2.NCBI_blastp_form(p))
                 .addClass('giraffe-left')
                 .addClass('giraffe-left-last')
         );
@@ -829,7 +829,7 @@ window.GiraffeAnalyze = function ($,gd,options) {
                             .addClass('giraffe-protein')
                             .append(overlay_switch.panes)
         ).append(
-            $(BioJS.NCBI_blastp_form(p))
+            $(BioJS2.NCBI_blastp_form(p))
                 .addClass('giraffe-left')
                 .addClass('giraffe-left-last')
         );
@@ -847,7 +847,7 @@ window.GiraffeAnalyze = function ($,gd,options) {
                             .addClass('giraffe-protein')
                             .append(overlay_switch.panes)
         ).append(
-            $(BioJS.NCBI_blastp_form(p))
+            $(BioJS2.NCBI_blastp_form(p))
                 .addClass('giraffe-left')
                 .addClass('giraffe-left-last')
         );
@@ -865,7 +865,7 @@ window.GiraffeAnalyze = function ($,gd,options) {
                             .addClass('giraffe-protein')
                             .append(overlay_switch.panes)
         ).append(
-            $(BioJS.NCBI_blastp_form(p))
+            $(BioJS2.NCBI_blastp_form(p))
                 .addClass('giraffe-left')
                 .addClass('giraffe-left-last')
         );
@@ -877,13 +877,13 @@ window.GiraffeAnalyze = function ($,gd,options) {
     function blast_tab(dom) {
         $(dom).append('<p><b>BLAST</b></p>'+
             '<p>BLAST finds regions of similarity between biological sequences. Click on the buttons below to BLAST your sequence. Results will appear in a new window.</p>');
-        var blastn = $(BioJS.NCBI_blastn_form(sequence));
-        var blastx = $(BioJS.NCBI_blastx_form(sequence));
+        var blastn = $(BioJS2.NCBI_blastn_form(sequence));
+        var blastx = $(BioJS2.NCBI_blastx_form(sequence));
         $(dom).append('<p>Search for matching nucleotide sequence with BLASTN:</p>')
             .append(blastn);
         $(dom).append('<p>Search for matching protein sequence with BLASTX:</p>')
             .append(blastx);
-        var recent = $(BioJS.NCBI_recent_results_link());
+        var recent = $(BioJS2.NCBI_recent_results_link());
         $(recent).append('See recent BLAST results on NCBI website.');
         $(dom).append($('<p></p>').append(recent));
     }
@@ -891,10 +891,10 @@ window.GiraffeAnalyze = function ($,gd,options) {
     function align_tab(dom) {
         $(dom).append('<p><b>Align Sequence with BLAST2</b></p>'+
             "<p>NCBI's BLAST2 program aligns two sequences. Enter a new sequence to align against your sequence. Results will appear in a new window.</p>");
-        var blast2 = $(BioJS.NCBI_blast2_form(sequence)).addClass('giraffe-blast2')
+        var blast2 = $(BioJS2.NCBI_blast2_form(sequence)).addClass('giraffe-blast2')
                 .append('<input type="reset" name="reset" value="Clear"/>');
         $(dom).append(blast2);
-        var recent = $(BioJS.NCBI_recent_results_link());
+        var recent = $(BioJS2.NCBI_recent_results_link());
         $(recent).append('See recent BLAST results on NCBI website.');
         $(dom).append($('<p></p>').append(recent));
     }
@@ -987,7 +987,7 @@ window.GiraffeAnalyze = function ($,gd,options) {
         var row;
         var start;
         var end;
-        var lines_10 = BioJS.wrap(sequence.sequence(),10);
+        var lines_10 = BioJS2.wrap(sequence.sequence(),10);
         function seq_mouseenter() {
             $(this).addClass('giraffe-seq-mouseover');
             var title = $(this).attr('start')+'-'+$(this).attr('end');

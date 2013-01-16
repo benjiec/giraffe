@@ -1,4 +1,4 @@
-window.BioJS = function(){
+window.BioJS2 = function(){
     if (typeof(Array.map) !== 'function') {
 
         /**
@@ -450,10 +450,10 @@ window.BioJS = function(){
             if (type == 'CDS' && features[i].clockwise_sequence &&
                 features[i].clockwise_sequence !== '') {
                 if (features[i].clockwise) {
-                    tran = new BioJS.DNASequence(features[i].clockwise_sequence).translate();
+                    tran = new BioJS2.DNASequence(features[i].clockwise_sequence).translate();
                 }
                 else {
-                    tran = new BioJS.DNASequence(features[i].clockwise_sequence)
+                    tran = new BioJS2.DNASequence(features[i].clockwise_sequence)
                         .reverse_complement().translate();
                 }
             }

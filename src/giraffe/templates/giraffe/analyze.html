@@ -143,7 +143,7 @@ jQuery(document).ready(function($){
     seq = seq.replace(/\s+/g,'');
     var db = $('#post-form input[name=db]').val();
     if (seq !== undefined && seq.length > 0) {
-      var gd = GiraffeDraw();
+      var gd = GiraffeDraw2();
       var data0 = [seq.length,
                    [{ "show_feature": 1,
                       "start": 100,
@@ -155,7 +155,7 @@ jQuery(document).ready(function($){
                     }],
                    seq];
       gd.read(data0);
-      var analyzer = GiraffeAnalyze($, gd, { 'dom_id': analyzer_dom_id, 'name': 'Sequence' });
+      var analyzer = GiraffeAnalyze2($, gd, { 'dom_id': analyzer_dom_id, 'name': 'Sequence' });
 
       $.post("{% url blat-post %}",
              { "sequence": seq, "db": db },
@@ -168,10 +168,10 @@ jQuery(document).ready(function($){
                    data[1].push(data0[1][i]);
                  }
                }
-               var gd = GiraffeDraw();
+               var gd = GiraffeDraw2();
                gd.read(data);
                $('#'+analyzer_dom_id).empty();
-               analyzer = GiraffeAnalyze($, gd, { 'dom_id': analyzer_dom_id, 'name': 'Sequence' });
+               analyzer = GiraffeAnalyze2($, gd, { 'dom_id': analyzer_dom_id, 'name': 'Sequence' });
              },
              'json');
       return;

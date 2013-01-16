@@ -9,7 +9,7 @@ API to retrieve array of features of a sequence from the server):
    <script src="/headers/js/raphael-min.js"></script>
    <script src="/headers/js/scale.raphael.js"></script>
    <script src="http://host/api/js/draw.js"></script>
-   <script> var gd = GiraffeDraw(); </script>
+   <script> var gd = GiraffeDraw2(); </script>
    <script src="http://host/blat/8de36469..../default?jsonp=gd.read">
    </script>
 
@@ -22,7 +22,7 @@ antisense features.
 E.g.
 
 <script>
-  var gd = GiraffeDraw();
+  var gd = GiraffeDraw2();
   gd.read([3000,[{"show_feature":1,"start":"100","end":"1100","feature":"GeneA","type_id":1,"clockwise":true},...]])
   gd.CircularMap(...)
 </script>

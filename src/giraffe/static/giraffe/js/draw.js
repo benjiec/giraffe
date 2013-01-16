@@ -137,7 +137,7 @@
  * @class JSON parsing and feature drawing capabilities for a single feature.
  *        Only one GiraffeDraw per sequence.
  */
-window.GiraffeDraw = function () {
+window.GiraffeDraw2 = function () {
 
     ///////////////////////////////////////////////////////////////////
     // GD-scope variables
