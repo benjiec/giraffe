@@ -2,6 +2,8 @@
 How to use widget embedded
   - Add JS helper to initial POST
 
+Verify digest working correctly with cutter positions, incl EarI
+
 Drawing bug - multiple labels highlighted on mouse over
 
 Add tests
@@ -12,6 +14,7 @@ Add tests
   - JS expects alignment match to include | for match, empty space for mismatch
   - JS test to show we list in frame tags with ORF
   - JS test linear mode specifies circular boundary ORFs
+  - JS test digest working correctly with cutter positions, incl EarI
 
 Add examples
   - Ajax POST
