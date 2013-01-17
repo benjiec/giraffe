@@ -1,7 +1,4 @@
 
-How to use widget embedded
-  - Add JS helper to initial POST
-
 Verify digest working correctly with cutter positions, incl EarI
 
 Drawing bug - multiple labels highlighted on mouse over
@@ -19,6 +16,8 @@ Add tests
 Add examples
   - Ajax POST
   - Layers
+
+Add JS helper to initiate POST and merge with existing features
 
 Show alignment part is slow; can we optimize this?
 
