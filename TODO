@@ -1,6 +1,14 @@
 
 Verify digest working correctly with cutter positions, incl EarI
 
+Create arbitrary blast DB
+  - Script/example for creating blast DB
+  - How to add links to blast results?
+
+Blast UI
+
+---
+
 Drawing bug - multiple labels highlighted on mouse over
 
 Add tests
@@ -20,10 +28,6 @@ Add examples
 Add JS helper to initiate POST and merge with existing features
 
 Show alignment part is slow; can we optimize this?
-
-Create arbitrary blast DB
-  - Script/example for creating blast DB
-  - How to add links to blast results?
 
 Blast API
   - Return in order of escore
