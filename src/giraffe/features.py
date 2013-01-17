@@ -72,7 +72,7 @@ class Feature_Type_Choices(Constant_Choices):
   ORIGIN        = (6,  'Origin')
   REGULATORY    = (7,  'Regulatory')
   TERMINATOR    = (8,  'Terminator')
-  EXACT_FEATURE = (9,  'ExactFeature')
+  CUSTOM        = (9,  'Custom')
   ORF           = (10, 'Orf')
   PROTEIN       = (11, 'Protein')
 

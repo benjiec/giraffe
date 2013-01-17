@@ -46,6 +46,11 @@ def _post(request):
         else:
             http_res = HttpResponse(j,status=httplib.OK)
 
+    # allow cross origin API calls
+    http_res['Access-Control-Allow-Origin'] = '*'
+    http_res['Access-Control-Allow-Methods'] = 'POST, GET, OPTIONS'
+    http_res['Access-Control-Max-Age'] = 1000
+
     return http_res
  
 

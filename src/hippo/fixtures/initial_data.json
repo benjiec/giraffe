@@ -59,7 +59,7 @@
     "pk": 9, 
     "model": "hippo.feature_type", 
     "fields": {
-      "type": "ExactFeature"
+      "type": "Custom"
     }
   }, 
   {
