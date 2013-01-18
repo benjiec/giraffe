@@ -154,10 +154,11 @@ def blast(sequence, db):
   infile = None
   feature_list = []
   input = clean_sequence(sequence)
+  input2 = input+input
 
   with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
     infile = f.name 
-    f.write(">Query\n%s\n" % (input,))
+    f.write(">Query\n%s\n" % (input2,))
 
   outfile = "%s.out.xml" % (infile,)
   blast_cl = NcbiblastnCommandline(query=infile, db="%s/%s" % (settings.NCBI_DATA_DIR, db),
@@ -199,9 +200,11 @@ def blast(sequence, db):
         if hit_start != 1 or hit_end != accession.feature_length:
           feature = '%s (%s-%s/%s)' % (feature, hit_start, hit_end, accession.feature_length)
 
-        f = Aligned_Feature(feature, alignment.hit_def, start, end, clockwise, accession.type,
-                            hsp.query, hsp.match, hsp.sbjct)
-        feature_list.append(f)
+        if start <= len(input):
+          end = end % len(input)
+          f = Aligned_Feature(feature, alignment.hit_def, start, end, clockwise, accession.type,
+                              hsp.query, hsp.match, hsp.sbjct)
+          feature_list.append(f)
 
   os.unlink(outfile)
   os.unlink(infile)
@@ -243,16 +246,16 @@ MyEnzymes = RestrictionBatch([x for x in _MyEnzymes if x.elucidate().find('^') >
 
 
 def find_restriction_sites(sequence):
-  input = Seq(clean_sequence(sequence))
-  rc = input.reverse_complement()
-  r = MyEnzymes.search(input)
+  input_seq = clean_sequence(sequence)
+  input2 = Seq(input_seq+input_seq)
+  r = MyEnzymes.search(input2)
   cutter_list = []
   for enzyme in r:
     v = r[enzyme]
     for cut in v:
       cut_after = cut-1
       if cut_after <= 0:
-        cut_after += len(input)
+        cut_after += len(input2)
       pattern = enzyme.elucidate()
       pattern = re.sub(r'_', '', pattern)
       cut_off = pattern.find('^')
@@ -261,19 +264,25 @@ def find_restriction_sites(sequence):
       # first try fwd
       start = cut-cut_off-1
       end = start+enzyme.size-1
-      # print 'try %s vs %s' % (input[start:end+1].lower(), enzyme.site.lower())
-      if str(input[start:end+1]).lower() == enzyme.site.lower():
-        f = Restriction_Site(enzyme, start+1, end+1, True, cut_after)
-        cutter_list.append(f)
-        # print 'found %s' % (f.to_dict(),)
+      # print 'try %s vs %s' % (input2[start:end+1].lower(), enzyme.site.lower())
+      if str(input2[start:end+1]).lower() == enzyme.site.lower():
+        if start < len(input_seq):
+          end = end % len(input_seq)
+          cut_after = cut_after % len(input_seq)
+          f = Restriction_Site(enzyme, start+1, end+1, True, cut_after)
+          cutter_list.append(f)
+          # print 'found %s' % (f.to_dict(),)
       else:
         end = cut+cut_off+1
         start = end-enzyme.size+1
-        # print 'try rc %s vs %s' % (input[start:end+1].reverse_complement().lower(), enzyme.site.lower())
-        if str(input[start:end+1].reverse_complement()).lower() == enzyme.site.lower():
-          f = Restriction_Site(enzyme, start+1, end+1, False, cut_after)
-          cutter_list.append(f)
-          # print 'found %s' % (f.to_dict(),)
+        # print 'try rc %s vs %s' % (input2[start:end+1].reverse_complement().lower(), enzyme.site.lower())
+        if str(input2[start:end+1].reverse_complement()).lower() == enzyme.site.lower():
+          if start < len(input_seq):
+            end = end % len(input_seq)
+            cut_after = cut_after % len(input_seq)
+            f = Restriction_Site(enzyme, start+1, end+1, False, cut_after)
+            cutter_list.append(f)
+            # print 'found %s' % (f.to_dict(),)
         else:
           raise Exception('Cannot find reported cut site %s %s %s %s' % (enzyme, cut, cut_off, pattern)) 
 

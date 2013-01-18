@@ -262,7 +262,7 @@ window.GiraffeAnalyze2 = function ($,gd,options) {
             'map_height' : map_height,
             'feature_click_callback' : map_feature_click_callback
         });
-        gc_c = GiraffeControl($, gd_c, dom_control_c, gd);
+        gc_c = GiraffeControl($, gd_c, dom_control_c, gd, 'map_gd_c');
 
         // Linear map pane
         dom_map_l = $('<div id="'+dom_map_id_l+'" class="giraffe-analyze-map giraffe-analyze-linear-map"></div>');
@@ -281,7 +281,7 @@ window.GiraffeAnalyze2 = function ($,gd,options) {
             'map_height' : map_height,
             'feature_click_callback' : map_feature_click_callback
         });
-        gc_l = GiraffeControl($, gd_l, dom_control_l, gd);
+        gc_l = GiraffeControl($, gd_l, dom_control_l, gd, 'map_gd_l');
 
         panes.hide_all();
         if (starts_with_linear_map) { panes.show(1); }
@@ -334,7 +334,7 @@ window.GiraffeAnalyze2 = function ($,gd,options) {
                 'map_height' : map_height,
                 'feature_click_callback' : map_feature_click_callback
             });
-            gc_l = GiraffeControl($, gd_l, dom_control_l, gd);
+            gc_l = GiraffeControl($, gd_l, dom_control_l, gd, "digest_gd_c");
             map_objects[0] = gd_l;
 
             // Circular digest pane
@@ -355,7 +355,7 @@ window.GiraffeAnalyze2 = function ($,gd,options) {
                 'map_height' : map_height * circular_digest_map_shrink_factor,
                 'feature_click_callback' : map_feature_click_callback
             });
-            gc_c = GiraffeControl($, gd_c, dom_control_c, gd);
+            gc_c = GiraffeControl($, gd_c, dom_control_c, gd, "digest_gd_c");
             map_objects[1] = gd_c;
 
             // Show the linear map by default
@@ -402,9 +402,7 @@ window.GiraffeAnalyze2 = function ($,gd,options) {
                 var all_of_this, cuts, fids;
                 var name, s, item;
 
-
                 if (typeof(cutters_to_show) == 'undefined' || cutters_to_show.length > 0) {
-
                     for (i = 0; i < all.length; i++) {
                         all_of_this = all[i].other_cutters();
                         cuts = [];
@@ -413,7 +411,6 @@ window.GiraffeAnalyze2 = function ($,gd,options) {
                             cuts.push(gd.all_features[all_of_this[c]].cut());
                             fids.push(gd.all_features[all_of_this[c]].id());
                         }
-
                         if (typeof(cutters_to_show) == 'undefined' ||
                             cutters_to_show.indexOf(cuts.length) >= 0) {
                             name = $('<td></td>')
@@ -435,8 +432,7 @@ window.GiraffeAnalyze2 = function ($,gd,options) {
                 var a0;
 
                 function cutter_sort(a,b) {
-                        return gd.all_features[a].start() -
-                            gd.all_features[b].start();
+                    return gd.all_features[a].start() - gd.all_features[b].start();
                 }
 
                 if (typeof(cutters_to_show) == 'undefined' ||
@@ -551,15 +547,13 @@ window.GiraffeAnalyze2 = function ($,gd,options) {
 
             // Update cutters_to_show to reflect the checkboxes selected in that pane
             cutters_to_show = [];
-            $(map_panes.pane(pane)).find("input[checked]").each(function () {
+            $(map_panes.pane(pane)).find(":checked").each(function () {
                 if ($(this).attr('name')) {
                     cutters_to_show.push(parseInt($(this).attr('name').match(/\d+/), 10));
                 }
             });
-
-            if ($(map_panes.pane(pane))
-                    .find('input[name="all-cutters"]')
-                    .attr("checked")) {
+            
+            if ($(map_panes.pane(pane)).find('input.all-cutters').is(":checked")) {
                 cutters_to_show = undefined;
             }
 
@@ -571,7 +565,7 @@ window.GiraffeAnalyze2 = function ($,gd,options) {
         $(map_panes.panes)
             .find('input[name="cutters-2"]')
             .closest('td')
-            .after('<td><label><input type="checkbox" name="all-cutters" value="show" />' +
+            .after('<td><label><input class="all-cutters" type="checkbox" name="all-cutters" value="show" />' +
                    '<span class="cutter-label">All</span></label></td>');
                           
 
@@ -580,73 +574,45 @@ window.GiraffeAnalyze2 = function ($,gd,options) {
             .find('input[name*="cutters"]')
             .not('[name="all-cutters"]')
             .click(function (event) {
-                var map = $(this)
-                              .closest('div.giraffe-digest-control')
-                              .siblings('div.giraffe-digest-map'),
+                var map = $(this).closest('div.giraffe-digest-control').siblings('div.giraffe-digest-map'),
                     n_cutter_boxes;
 
                 cutters_to_show = [];
 
                 // Parse out selected options
                 n_cutter_boxes = 0;
-                $(this)
-                    .closest('tbody')
-                    .find('input[name|="cutters"]')
-                    .each(function () {
-                        n_cutter_boxes++;
-                        if ($(this).attr('checked')) {
-                            cutters_to_show.push(
-                                parseInt($(this).attr('name').match(/\d+/), 10)
-                            );
-                        }
-                    });
+                $(this).closest('tbody').find('input[name|="cutters"]').each(function () {
+                    n_cutter_boxes++;
+                    if ($(this).is(':checked')) {
+                        cutters_to_show.push(
+                            parseInt($(this).attr('name').match(/\d+/), 10)
+                        );
+                    }
+                });
 
                 // Make sure all-cutters checkbox is unchecked if the list is
                 // not at maximum capacity
                 if (cutters_to_show.length < n_cutter_boxes) {
-                    $(this)
-                        .closest('tbody')
-                        .find('input[name="all-cutters"]')
-                        .removeAttr('checked');
+                    $(this).closest('tbody').find('input[name="all-cutters"]').removeAttr('checked');
                 }
 
                 write_digest_data();
             });
 
         $(map_panes.panes).find('input[name="all-cutters"]').click(function (event) {
-            
-            var map = $(this)
-                          .closest('div.giraffe-digest-control')
-                          .siblings('div.giraffe-digest-map'),
+            var map = $(this).closest('div.giraffe-digest-control').siblings('div.giraffe-digest-map'),
                 n_cutter_boxes;
 
-            if ($(this).attr('checked')) {
-
+            if ($(this).is(':checked')) {
                 // Make sure 1- and 2- cutter checkboxes are no longer checked
-                $(this)
-                    .closest('tbody')
-                    .find('input[name|="cutters"]')
-                    .removeAttr('checked');
-
+                $(this).closest('tbody').find('input[name|="cutters"]').removeAttr('checked');
                 // Show all cutters below
                 cutters_to_show = undefined;
-                map_objects[map_panes.current()].redraw_cutters();
+                map_objects[map_panes.current()].redraw_cutters(undefined);
                 write_digest_data();
 
             } else {
-
-                // All n-cutter boxes are checked; we just need
-                // to know how many there are
-                n_cutter_boxes = $(this)
-                    .closest('tbody')
-                    .find('input[name|="cutters"]')
-                    .length;
-
-                cutters_to_show = new Array(n_cutter_boxes);
-                for(ix = 0; ix < n_cutter_boxes; ix++) {
-                    cutters_to_show[ix] = ix + 1;
-                }
-                        
+                cutters_to_show = new Array();
                 map_objects[map_panes.current()].redraw_cutters();
                 write_digest_data();
             }
@@ -1489,7 +1455,7 @@ window.GiraffeTable = function ($,gd,dom) {
     return $(dom);
 };
 
-window.GiraffeControl = function ($,gd_map,dom,gd) {
+window.GiraffeControl = function ($,gd_map,dom,gd,control_name) {
     var controls,
         table,
         _debug = false,
@@ -1504,7 +1470,8 @@ window.GiraffeControl = function ($,gd_map,dom,gd) {
     draw_layer_controls = true;
 
     controls = $('<form action="" class="giraffe-controls">' +
-        '<fieldset><legend>Feature Options</legend><table><tbody class="giraffe-controls-layout"></tbody></table>' +
+        '<fieldset><legend>Feature Options</legend>'+
+                   '<table><tbody class="giraffe-controls-layout"></tbody></table>' +
         '</fieldset></form>');
 
     if (draw_enzyme_controls) {
@@ -1512,11 +1479,9 @@ window.GiraffeControl = function ($,gd_map,dom,gd) {
             '<tr><td class="enzymes"><table>' +
             '<tbody>' +
                 '<tr><th>Restriction Enzymes</th>' +
-                '<td><label><input type="checkbox" checked="checked"' +
-                             'name="cutters-1" value="show" />' +
+                '<td><label><input type="checkbox" checked="checked" class="'+control_name+'" name="cutters-1" value="show" />' +
                 '<span class="cutter-label">Unique</span></label></td>' +
-                '<td><label><input type="checkbox" ' +
-                              'name="cutters-2" value="show" />' +
+                '<td><label><input type="checkbox" class="'+control_name+'" name="cutters-2" value="show" />' +
                 '<span class="cutter-label">2-cutters</span></label></td>' +
                 '</tr>'+
             '</tbody>' +
@@ -1528,14 +1493,13 @@ window.GiraffeControl = function ($,gd_map,dom,gd) {
         // 1- and 2- cutter checkboxes
         controls.find('input[name|="cutters"]').click(function (event) {
             var opts = [];
-
             // Parse out selected 1- or 2-cutter options
-            $(this).closest('tbody')
-                .find('input[checked][name|="cutters"]')
-                .each(function () {
-                    opts.push(parseInt($(this).attr('name').match(/\d+/), 10));
-                });
-
+            $(this).closest('tbody').find('input[name|="cutters"]:checked').each(function () {
+                if ($(this).attr('name')) {
+                  var o = parseInt($(this).attr('name').match(/\d+/), 10);
+                  opts.push(o);
+                }
+            });
             gd_map.redraw_cutters(opts);
         });
     }
@@ -1569,7 +1533,7 @@ window.GiraffeControl = function ($,gd_map,dom,gd) {
             var layer_name;
             layer_name = $(this).attr("data-layer");
 
-            if ($(this).attr("checked")) {
+            if ($(this).is(":checked")) {
                 gd_map.show_feature_layer(layer_name);
             } else {
                 gd_map.hide_feature_layer(layer_name);

@@ -1,6 +1,4 @@
 
-Verify digest working correctly with cutter positions, incl EarI
-
 Create arbitrary blast DB
   - Script/example for creating blast DB
   - How to add links to blast results?
@@ -15,7 +13,12 @@ Add tests
   - Allow GATCRYWSMKHBVDN
   - Orf detection
   - Cutter detection - report start, end, cut correctly
+  - Orf, Feature, Cutter detection across boundary
   - Passing cutter information to javascript
+  - EarI at start/boundary detected as cutter
+  - JS accounts for EarI across boundary or before boundary but cut site afterward
+  - JS accounts for cutter across boundary in N-cutter analysis
+  - JS reports EarI at start and elsewhere as two cutter
   - JS expects alignment match to include | for match, empty space for mismatch
   - JS test to show we list in frame tags with ORF
   - JS test linear mode specifies circular boundary ORFs
@@ -27,14 +30,17 @@ Add examples
 
 Add JS helper to initiate POST and merge with existing features
 
-Show alignment part is slow; can we optimize this?
+Digest handling improvements
+  - Digest handling pushed to BioJS? Take in cutters, produce digests?
+  - Linear digest - showing EarI digest even when EarI is across boundary, this is wrong
+  - EarI across boundary is considered a cutter in N-cutter analysis, this is wrong
 
 Blast API
   - Return in order of escore
   - Getting word_size from params
   - Need UI widget?
 
-Customize alayzer widget BLAST button - add custom blast buttons
+Customize analyzer widget BLAST button - add custom blast buttons
 
 Add back non-cutters analysis, but have to pass this in from backend
 
