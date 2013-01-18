@@ -72,7 +72,7 @@ svg path { cursor:pointer; }
 #giraffe-viewer-search-textarea:hover { height:60px; width:120px; }
 
 .giraffe-seq-highlight,
-#giraffe-viewer-topbar-highlight { background-color:#aa3333; color:#fff; }
+#giraffe-viewer-topbar-highlight, #giraffe-viewer-topbar-highlight a { background-color:#aa3333; color:#fff; }
 /* -mouseover comes after -highlight, so takes precedence */
 .giraffe-seq-mouseover,
 #giraffe-viewer-topbar-mouseover { background-color:yellow; color:black; }

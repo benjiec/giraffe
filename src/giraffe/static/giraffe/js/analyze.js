@@ -1114,7 +1114,7 @@ window.GiraffeAnalyze2 = function ($,gd,options) {
         });
     }
 
-    function sequence_viewer_bp_event_highlight(bp,title) {
+    function sequence_viewer_bp_event_highlight(bp,title,link) {
         var i;
         var t, new_t;
 
@@ -1130,7 +1130,12 @@ window.GiraffeAnalyze2 = function ($,gd,options) {
         
         var desc = bp[0];
         if (bp[0] != bp[1]) { desc += '-'+bp[1]; }
-        desc += ': '+title;
+        if (link) {
+            desc += ': <a href="'+link+'">'+title+'</a>';
+        }
+        else {
+            desc += ': '+title;
+        }
         $(sequence_viewer_topbar_highlight).html(desc);
 
         // draw first
@@ -1279,7 +1284,7 @@ window.GiraffeAnalyze2 = function ($,gd,options) {
             }
         }
 
-        sequence_viewer_bp_event_highlight(bp,name);
+        sequence_viewer_bp_event_highlight(bp,name,feature.link());
         show_alignment(feature);
     }
 

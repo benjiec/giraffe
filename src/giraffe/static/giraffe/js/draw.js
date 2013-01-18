@@ -232,6 +232,8 @@ window.GiraffeDraw2 = function () {
         var _label;
         if (feat.label) { _label = feat.label; }
         else { _label = _name; }
+        var _link;
+        if (feat.link) { _link = feat.link; }
         var _start = parseInt(feat.start, 10);
         var _end = parseInt(feat.end, 10);
         var _type = parseInt(feat.type_id, 10);
@@ -250,6 +252,7 @@ window.GiraffeDraw2 = function () {
 
         // Accessors for private properties set at creation
         this.layer = function() { return _layer; };
+        this.link = function() { return _link; };
         this.label = function() { return _label; };
         this.name = function() { return _name; };
         this.start = function() { return _start; };
