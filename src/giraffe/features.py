@@ -250,29 +250,32 @@ def find_restriction_sites(sequence):
   for enzyme in r:
     v = r[enzyme]
     for cut in v:
+      cut_after = cut-1
+      if cut_after <= 0:
+        cut_after += len(input)
       pattern = enzyme.elucidate()
       pattern = re.sub(r'_', '', pattern)
-      cut_after = pattern.find('^')
-      if cut_after < 0:
+      cut_off = pattern.find('^')
+      if cut_off < 0:
         raise Exception('Cannot find cut site for %s (%s)' % (enzyme, pattern))
       # first try fwd
-      start = cut-cut_after-1
+      start = cut-cut_off-1
       end = start+enzyme.size-1
       # print 'try %s vs %s' % (input[start:end+1].lower(), enzyme.site.lower())
       if str(input[start:end+1]).lower() == enzyme.site.lower():
-        f = Restriction_Site(enzyme, start+1, end+1, True, cut)
+        f = Restriction_Site(enzyme, start+1, end+1, True, cut_after)
         cutter_list.append(f)
         # print 'found %s' % (f.to_dict(),)
       else:
-        end = cut+cut_after+1
+        end = cut+cut_off+1
         start = end-enzyme.size+1
         # print 'try rc %s vs %s' % (input[start:end+1].reverse_complement().lower(), enzyme.site.lower())
         if str(input[start:end+1].reverse_complement()).lower() == enzyme.site.lower():
-          f = Restriction_Site(enzyme, start+1, end+1, False, cut)
+          f = Restriction_Site(enzyme, start+1, end+1, False, cut_after)
           cutter_list.append(f)
           # print 'found %s' % (f.to_dict(),)
         else:
-          raise Exception('Cannot find reported cut site %s %s %s %s' % (enzyme, cut, cut_after, pattern)) 
+          raise Exception('Cannot find reported cut site %s %s %s %s' % (enzyme, cut, cut_off, pattern)) 
 
   return cutter_list
 
