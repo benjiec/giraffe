@@ -5,6 +5,9 @@ Create arbitrary blast DB
 
 Blast UI
 
+Input list of addition features to blast2 against query - useful for aligning
+seq results
+
 ---
 
 Drawing bug - multiple labels highlighted on mouse over
