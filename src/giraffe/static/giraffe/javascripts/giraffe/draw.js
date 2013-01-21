@@ -320,6 +320,7 @@ window.GiraffeDraw2 = function () {
 
         // Visual properties
         thi$.visible = true;
+        thi$.enzyme_visible = true;
         thi$.labeled = true;
 
         // Easy access to drawing objects
@@ -466,23 +467,34 @@ window.GiraffeDraw2 = function () {
           if (this.visible) { return true; } else { return false; }
         }
 
+        thi$.set_hide_enzyme = function () {
+            this.enzyme_visible = false;
+        }
+
         thi$.hide = function () {
             if (this.visible) {
                 if (this.feature_set) { this.feature_set.hide(); }
+                if (this.labeled) {
+                    if (this.label_set) { this.label_set.hide(); }
+                }
                 this.visible = false;
                 this.labeled = false;
             }
-        }; // END DrawnFeature::hide()
+        }
 
         thi$.show = function () {
             if (!this.visible) {
                 if (this.feature_set) { this.feature_set.show(); }
                 if (!this.labeled) {
-                    if (this.label_set) { this.label_set.hide(); }
+                    if (this.label_set) { this.label_set.show(); }
                 }
                 this.visible = true;
             }
         }; // END DrawnFeature::show()
+
+        thi$.set_show_enzyme = function () {
+            this.enzyme_visible = true;
+        }
 
         thi$.hide_label = function () {
             if (this.labeled) {
@@ -708,11 +720,9 @@ window.GiraffeDraw2 = function () {
                 if (f.type() == ft.enzyme) {
                     if (typeof(_cutters_to_show) !== 'undefined' &&
                         _cutters_to_show.indexOf(f.cut_count()) < 0) {
-                        f.hide();
-                        f.clear_label();
+                        f.set_hide_enzyme();
                     } else {
-                        f.show();
-                        f.show_label();
+                        f.set_show_enzyme();
                     }
                 }
             }
@@ -1106,7 +1116,7 @@ window.GiraffeDraw2 = function () {
 
             // Feature drawing
             thi$.draw = function () {
-                if (!this.visible) { return; }
+                if (!this.visible || !this.enzyme_visible) { return; }
 
                     // Convert from sequence positions to angles
                 var a0 = convert.pos_to_angle(this.start()),
@@ -1215,7 +1225,7 @@ window.GiraffeDraw2 = function () {
             // Should we draw the label?
             thi$.should_draw_label = function () {
                 // Don't bother unless we need to
-                if (!this.visible || !this.labeled) {
+                if (!this.visible || !this.enzyme_visible || !this.labeled) {
                     return false;
                 }
                 return true;

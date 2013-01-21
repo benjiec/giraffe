@@ -26,6 +26,7 @@ Add tests
   - JS test to show we list in frame tags with ORF
   - JS test linear mode specifies circular boundary ORFs
   - JS test digest working correctly with cutter positions, incl EarI
+  - JS test for layer control - e.g. Restriction Enzyme
 
 Add examples
   - Ajax POST
