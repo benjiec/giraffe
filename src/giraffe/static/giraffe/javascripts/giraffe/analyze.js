@@ -26,8 +26,8 @@
 //    map_width: map width
 //    map_height: map height
 //    analyzer_width: main width of the entire analyzer
-//    linear_map: if 1, switch to linear map to start (default is 0,
-//    and uses circular map)
+//    linear_map: if 1, switch to linear map to start (default is 0, and uses circular map)
+//    exclude_layers: list of layers to exclude on start
 // 
 
 (function(){
@@ -49,6 +49,8 @@ window.GiraffeAnalyze2 = function ($,gd,options) {
     if ('analyzer_width' in options) { analyzer_width = options.analyzer_width; }
     var starts_with_linear_map = false;
     if ('linear_map' in options && options.linear_map) { starts_with_linear_map = true; }
+    var exclude_layers = [];
+    if ('exclude_layers' in options) { exclude_layers = options.exclude_layers; }
 
     var viewer_segs_per_line = 5;
 
@@ -261,7 +263,7 @@ window.GiraffeAnalyze2 = function ($,gd,options) {
             'map_height' : map_height,
             'feature_click_callback' : map_feature_click_callback
         });
-        gc_c = GiraffeControl($, gd_c, dom_control_c, gd, 'map_gd_c');
+        gc_c = GiraffeControl($, gd_c, dom_control_c, gd, 'map_gd_c', exclude_layers);
 
         // Linear map pane
         dom_map_l = $('<div id="'+dom_map_id_l+'" class="giraffe-analyze-map giraffe-analyze-linear-map"></div>');
@@ -280,7 +282,7 @@ window.GiraffeAnalyze2 = function ($,gd,options) {
             'map_height' : map_height,
             'feature_click_callback' : map_feature_click_callback
         });
-        gc_l = GiraffeControl($, gd_l, dom_control_l, gd, 'map_gd_l');
+        gc_l = GiraffeControl($, gd_l, dom_control_l, gd, 'map_gd_l', exclude_layers);
 
         panes.hide_all();
         if (starts_with_linear_map) { panes.show(1); }
@@ -333,7 +335,7 @@ window.GiraffeAnalyze2 = function ($,gd,options) {
                 'map_height' : map_height,
                 'feature_click_callback' : map_feature_click_callback
             });
-            gc_l = GiraffeControl($, gd_l, dom_control_l, gd, "digest_gd_c");
+            gc_l = GiraffeControl($, gd_l, dom_control_l, gd, "digest_gd_c", exclude_layers);
             map_objects[0] = gd_l;
 
             // Circular digest pane
@@ -354,7 +356,7 @@ window.GiraffeAnalyze2 = function ($,gd,options) {
                 'map_height' : map_height * circular_digest_map_shrink_factor,
                 'feature_click_callback' : map_feature_click_callback
             });
-            gc_c = GiraffeControl($, gd_c, dom_control_c, gd, "digest_gd_c");
+            gc_c = GiraffeControl($, gd_c, dom_control_c, gd, "digest_gd_c", exclude_layers);
             map_objects[1] = gd_c;
 
             // Show the linear map by default
@@ -1459,7 +1461,7 @@ window.GiraffeTable = function ($,gd,dom) {
     return $(dom);
 };
 
-window.GiraffeControl = function ($,gd_map,dom,gd,control_name) {
+window.GiraffeControl = function ($,gd_map,dom,gd,control_name,exclude_layers) {
     var controls,
         table,
         _debug = false,
@@ -1524,10 +1526,15 @@ window.GiraffeControl = function ($,gd_map,dom,gd,control_name) {
             .find('tbody');
 
         for (li = 0; li < layers.length; li++) {
+            var checked = ' checked="checked"';
+            if (exclude_layers.indexOf(layers[li]) >= 0) {
+                checked = '';
+                gd_map.hide_feature_layer(layers[li]);
+            }
             layer_control_table.append(
             '<tr>'+
-                '<td><input type="checkbox" checked="checked"' +
-                     'data-layer="' + layers[li] + '" value="show" />' +
+                '<td><input type="checkbox" ' + checked +
+                     ' data-layer="' + layers[li] + '" value="show" />' +
                 '</td>' +
                 '<td>' +  layers[li] + '</td></tr>');
         }
@@ -1536,7 +1543,6 @@ window.GiraffeControl = function ($,gd_map,dom,gd,control_name) {
         controls.find('td.layers input[value="show"]').click(function (event) {
             var layer_name;
             layer_name = $(this).attr("data-layer");
-
             if ($(this).is(":checked")) {
                 gd_map.show_feature_layer(layer_name);
             } else {

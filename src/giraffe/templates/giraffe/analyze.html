@@ -78,7 +78,11 @@ jQuery(document).ready(function($){
                var gd = GiraffeDraw2();
                gd.read(data);
                $('#'+analyzer_dom_id).empty();
-               analyzer = GiraffeAnalyze2($, gd, { 'dom_id': analyzer_dom_id, 'name': 'Sequence' });
+               analyzer = GiraffeAnalyze2($, gd, {
+                 'dom_id': analyzer_dom_id,
+                 'name': 'Sequence',
+                 'exclude_layers': 'Restriction Enzymes',
+               });
              },
              'json');
       return;
