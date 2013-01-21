@@ -1,0 +1,1 @@
+../../../../../src/giraffe/static/giraffe/javascripts/draw.js

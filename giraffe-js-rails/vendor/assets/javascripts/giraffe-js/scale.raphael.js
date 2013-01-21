@@ -1,0 +1,1 @@
+../../../../../src/giraffe/static/giraffe/javascripts/scale.raphael.js
