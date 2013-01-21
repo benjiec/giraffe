@@ -7,7 +7,7 @@
 svg text tspan { cursor:pointer; }
 svg path { cursor:pointer; }
 
-/* overriding jquery */
+/* overriding jquery UI */
 .giraffe-main .giraffe-tab a { color:#06c; text-decoration:underline; }
 .giraffe-main form input[type=submit] { font-size:12px; }
 
