@@ -15,7 +15,7 @@ class FeatureAdmin(admin.ModelAdmin):
         return ', '.join(s)
     db.short_description = 'Database'
 
-    list_display = ('name','type',sequence,'cut_after','last_modified',db)
+    list_display = ('name','type',sequence,'last_modified',db)
     list_filter = ('type',)
     search_fields = ('name',)
 

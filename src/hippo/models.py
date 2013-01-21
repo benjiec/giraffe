@@ -28,7 +28,6 @@ class Feature(models.Model):
     name = models.CharField(max_length=32,db_index=True)
     sequence = models.TextField()
     hash = models.CharField(max_length=64)
-    cut_after = models.PositiveIntegerField(null=True,blank=True)
     last_modified = models.DateTimeField(auto_now=True,db_index=True)
 
     def save(self):
