@@ -3,7 +3,6 @@
 <head>
   <link href="/static/giraffe/vendor/jquery-ui-1.9.2.custom/css/smoothness/jquery-ui-1.9.2.custom.min.css"
         rel="stylesheet" type="text/css" />
-  <link href="/static/giraffe/stylesheets/analyze.css" rel="stylesheet" type="text/css"/>
   <link href="/static/giraffe/stylesheets/demo.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -15,7 +14,7 @@
   </p>
 </div>
 
-<h2>Analyze Sequence</h2>
+<h2>Draw Plasmid Map</h2>
 
 <div id="post-form">
   <input type="hidden" name="db" value="default" />
@@ -26,23 +25,21 @@ ctcttcgctactatgagtggttgctggataactttacgggcatgcataaggctcgtatgatatattcagggagaccacaa
 
 </div>
 
-<div id="giraffe-analyze"></div>
+<div id="giraffe-map"></div>
 
 <script src="/static/giraffe/vendor/raphael-min.js"></script>
 <script src="/static/giraffe/vendor/jquery-1.9.0.min.js"></script>
 <script src="/static/giraffe/vendor/jquery-ui-1.9.2.custom/js/jquery-ui-1.9.2.custom.min.js"></script>
 
 <script src="/static/giraffe/javascripts/scale.raphael.js"></script>
-<script src="/static/giraffe/javascripts/bio.js"></script>
 <script src="/static/giraffe/javascripts/draw.js"></script>
-<script src="/static/giraffe/javascripts/analyze.js"></script>
 
 <script>
 
 jQuery(document).ready(function($){
   $('#post-form .button a').click(function(evt){
     evt.preventDefault();
-    var analyzer_dom_id = 'giraffe-analyze';
+    var analyzer_dom_id = 'giraffe-map';
     $('#'+analyzer_dom_id).empty();
 
     var seq = $('#post-form textarea[name=sequence]').val();
@@ -62,7 +59,7 @@ jQuery(document).ready(function($){
                     }],
                    seq];
       gd.read(data0);
-      var analyzer = GiraffeAnalyze2($, gd, { 'dom_id': analyzer_dom_id, 'name': 'Sequence' });
+      gd.CircularMap({ 'map_dom_id' : analyzer_dom_id, 'plasmid_name' : 'My Plasmid' })
 
       $.post("{% url giraffe-analyze %}",
              { "sequence": seq, "db": db },
@@ -78,7 +75,7 @@ jQuery(document).ready(function($){
                var gd = GiraffeDraw2();
                gd.read(data);
                $('#'+analyzer_dom_id).empty();
-               analyzer = GiraffeAnalyze2($, gd, { 'dom_id': analyzer_dom_id, 'name': 'Sequence' });
+               gd.CircularMap({ 'map_dom_id' : analyzer_dom_id, 'plasmid_name' : 'My Plasmid' })
              },
              'json');
       return;
@@ -91,6 +88,4 @@ jQuery(document).ready(function($){
 
 </body>
 </html>
-
-
 

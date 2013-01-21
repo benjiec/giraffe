@@ -23,9 +23,12 @@ It is now maintained by Benjie Chen.
 Giraffe - Visualization
 -----------------------
 
-You can use Giraffe independently. See HTML files in src/giraffe/demo
-directory. Also README file in src/giraffe/static/js describes how to use just
-the Javascript plasmid drawing widget.
+You can use Giraffe Javascripts independently of the Django service, to
+visualize a sequence you already have a list of features for. See
+src/giraffe/templates/giraffe/{analyze,draw}.html.
+
+src/giraffe/static/javascripts/README describes how to use just the Javascript
+plasmid drawing widget.
 
 
 Giraffe - Sequence feature detection

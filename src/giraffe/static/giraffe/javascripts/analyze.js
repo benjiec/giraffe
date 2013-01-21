@@ -1,7 +1,6 @@
 // Requires: 
-//    jquery-ui 1.8.6
-//    jquery 1.4.2
-//    jquery.ui.tooltip (part of jquery UI 1.9)
+//    jquery-ui 1.9.2
+//    jquery 1.9
 //    draw.js
 //
 // Restriction: can only have one instance of this per DOM

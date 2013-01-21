@@ -1,9 +1,8 @@
 body {
   font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;
   font-size: 14px;
+  margin-left: 10px;
 }
-
-#container { text-align:left; }
 
 #header {
   background-color:#5c9ccc;
@@ -23,8 +22,6 @@ body {
 
 #title { font-size:38px; }
 #header p { margin-left: 30px; }
-
-#body { margin-left:30px; }
 
 textarea.sequence {
   width:800px;height:200px;
