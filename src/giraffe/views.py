@@ -13,7 +13,7 @@ def _post(request):
     """
 
     db_name = request.REQUEST['db'].strip()
-    sequence = features.clean_sequence(request.REQUEST['sequence'])
+    sequence = features.clean_dna_sequence(request.REQUEST['sequence'])
 
     # feature detection
     feature_list = features.blast(sequence, db_name)

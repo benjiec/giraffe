@@ -13,7 +13,7 @@ seq results
 Drawing bug - multiple labels highlighted on mouse over
 
 Add tests
-  - Allow GATCRYWSMKHBVDN
+  - Allow GATCRYWSMKHBVDN, but not in features
   - Orf detection
   - Cutter detection - report start, end, cut correctly
   - Orf, Feature, Cutter detection across boundary

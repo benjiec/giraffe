@@ -1,4 +1,4 @@
-from Bio.Alphabet import IUPAC
+from Bio.Alphabet import IUPAC, _verify_alphabet
 from Bio.Seq import Seq
 import re
 import os
@@ -8,11 +8,14 @@ import os
 # Sequence cleaning
 #
 
-def clean_sequence(sequence):
+def clean_dna_sequence(sequence, strict=False, alphabet=None):
   sequence = sequence.strip()
   sequence = re.sub(r'\s+', '', sequence)
-  # this throws exception if DNA is not valid
-  sequence = str(Seq(sequence, IUPAC.ambiguous_dna))
+  if strict: # throws exception if DNA is not valid
+    if alphabet is None:
+      alphabet = IUPAC.unambiguous_dna
+    if not _verify_alphabet(Seq(sequence.upper(), alphabet)):
+      raise Exception("Sequence %s contains illegal character. Expecting %s only." % (sequence, alphabet.letters))
   return sequence
 
 
@@ -153,7 +156,7 @@ import subprocess
 def blast(sequence, db):
   infile = None
   feature_list = []
-  input = clean_sequence(sequence)
+  input = clean_dna_sequence(sequence)
   input2 = input+input
 
   with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
@@ -246,7 +249,7 @@ MyEnzymes = RestrictionBatch([x for x in _MyEnzymes if x.elucidate().find('^') >
 
 
 def find_restriction_sites(sequence):
-  input_seq = clean_sequence(sequence)
+  input_seq = clean_dna_sequence(sequence)
   input2 = Seq(input_seq+input_seq)
   r = MyEnzymes.search(input2)
   cutter_list = []

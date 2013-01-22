@@ -3,7 +3,7 @@ from hippo.models import Feature_Database
 import os
 import tempfile
 import subprocess
-from giraffe.features import clean_sequence, Blast_Accession
+from giraffe.features import clean_dna_sequence, Blast_Accession
 from django.conf import settings
 
 
@@ -17,7 +17,7 @@ class Command(BaseCommand):
         infile = f.name
         for feature in feature_db.features.all():
           #print feature.name
-          data = clean_sequence(feature.sequence)
+          data = clean_dna_sequence(feature.sequence, True)
           f.write(">gnl|%s|%s %s\n%s\n" % (
                    feature_db.name,
                    Blast_Accession.make(type=feature.type.type, feature_id=feature.id, feature_length=len(data)),

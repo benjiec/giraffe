@@ -29,7 +29,7 @@ class Feature(models.Model):
     last_modified = models.DateTimeField(auto_now=True,db_index=True)
 
     def save(self):
-        self.sequence = giraffe.features.clean_sequence(self.sequence)
+        self.sequence = giraffe.features.clean_dna_sequence(self.sequence, True)
         return super(Feature,self).save()
 
     def __unicode__(self):
