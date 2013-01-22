@@ -2,7 +2,6 @@ from django.db import models
 from django.db import utils
 import giraffe.features
 import datetime
-import hashlib
 import re
 
 
@@ -27,20 +26,17 @@ class Feature(models.Model):
     type = models.ForeignKey(Feature_Type)
     name = models.CharField(max_length=32,db_index=True)
     sequence = models.TextField()
-    hash = models.CharField(max_length=64)
     last_modified = models.DateTimeField(auto_now=True,db_index=True)
 
     def save(self):
-        self.sequence = Sequence.strip(self.sequence)
-        self.hash = hashlib.sha1(self.sequence.lower()).hexdigest()
+        self.sequence = giraffe.features.clean_sequence(self.sequence)
         return super(Feature,self).save()
 
     def __unicode__(self):
         return self.name
 
     class Meta:
-        unique_together = (("name","hash"),)
-        ordering = ('type','name')
+        ordering = ('type', 'name')
 
 
 class Feature_Database(models.Model):
