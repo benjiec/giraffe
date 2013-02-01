@@ -220,11 +220,13 @@ window.GiraffeAnalyze2 = function ($,gd,options) {
         panes = Switch_Panes(['Circular Map', 'Linear Map']);
 
         var help, // DOMs
+            dom_zoom_id_c = random_dom_id(), 
             dom_map_id_c = random_dom_id(), 
             dom_map_c,
             dom_align_c,
             dom_control_id_c = random_dom_id(), 
             dom_control_c,
+            dom_zoom_id_l = random_dom_id(), 
             dom_map_id_l = random_dom_id(), 
             dom_map_l,
             dom_align_l,
@@ -247,11 +249,18 @@ window.GiraffeAnalyze2 = function ($,gd,options) {
 
 
         // Circular map pane
+        dom_zoom_c = $('<a></a>').text('Zoom/Reset').addClass('giraffe-zoom-control').click(function() {
+          var zoomable = $('#'+dom_zoom_id_c);
+          if ($(zoomable).hasClass('giraffe-zoom')) { $(zoomable).removeClass('giraffe-zoom'); } else { $(zoomable).addClass('giraffe-zoom'); } 
+        });
+        dom_zoomable_c = $('<div id="'+dom_zoom_id_c+'"></div>');
         dom_map_c = $('<div id="'+dom_map_id_c+'" class="giraffe-analyze-map giraffe-analyze-circular-map"></div>');
         dom_align_c = $('<div class="giraffe-analyze-alignment"></div>');
         dom_control_c = $('<div id="' + dom_control_id_c + '" class="giraffe-analyze-map-control"></div>');
+        
+        $(dom_zoomable_c).append(dom_zoom_c).append(dom_map_c);
         $(panes.pane(0))
-            .append(dom_map_c)
+            .append(dom_zoomable_c)
             .append(dom_align_c)
             .append(dom_control_c);
 
@@ -266,11 +275,18 @@ window.GiraffeAnalyze2 = function ($,gd,options) {
         gc_c = GiraffeControl($, gd_c, dom_control_c, gd, 'map_gd_c', exclude_layers);
 
         // Linear map pane
+        dom_zoom_l = $('<a></a>').text('Zoom/Reset').addClass('giraffe-zoom-control').click(function() {
+          var zoomable = $('#'+dom_zoom_id_l);
+          if ($(zoomable).hasClass('giraffe-zoom')) { $(zoomable).removeClass('giraffe-zoom'); } else { $(zoomable).addClass('giraffe-zoom'); } 
+        });
+        dom_zoomable_l = $('<div id="'+dom_zoom_id_l+'"></div>');
         dom_map_l = $('<div id="'+dom_map_id_l+'" class="giraffe-analyze-map giraffe-analyze-linear-map"></div>');
         dom_align_l = $('<div class="giraffe-analyze-alignment"></div>');
         dom_control_l = $('<div id="' + dom_control_id_c + '" class="giraffe-analyze-map-control"></div>');
+
+        $(dom_zoomable_l).append(dom_zoom_l).append(dom_map_l);
         $(panes.pane(1))
-            .append(dom_map_l)
+            .append(dom_zoomable_l)
             .append(dom_align_l)
             .append(dom_control_l);
 
