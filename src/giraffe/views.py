@@ -61,3 +61,50 @@ def post(request):
     print str(e)
     raise(e)
 
+
+def _blast2(request):
+    """
+    Post query and subject sequences, returns alignment of the two using blastn.
+    Expects: query, subject
+    Response: JSON dictionary with subject and query strings
+    """
+
+    if (not 'subject' in request.REQUEST) or (not 'query' in request.REQUEST):
+      res = []
+
+    else:
+      subject = features.clean_dna_sequence(request.REQUEST['subject'])
+      query = features.clean_dna_sequence(request.REQUEST['query'])
+      res = features.blast2(subject, query)
+
+    j = json.JSONEncoder().encode(res)
+
+    if 'jsonp' in request.REQUEST:
+      j = request.REQUEST['jsonp']+'('+j+')'
+      http_res = HttpResponse(j,mimetype="text/javascript",status=httplib.OK)
+
+    else:
+      # technically we should be returning "application/json", but in that
+      # case browsers force user to download into a file, and for debugging
+      # we want to be able to see the JSON list in browser. looks like most
+      # browsers will handle JSON sent back as text/html anyways.
+      if request.is_ajax():
+        http_res = HttpResponse(j,mimetype="application/json",status=httplib.OK)
+      else:
+        http_res = HttpResponse(j,status=httplib.OK)
+
+    # allow cross origin API calls
+    http_res['Access-Control-Allow-Origin'] = '*'
+    http_res['Access-Control-Allow-Methods'] = 'POST, GET, OPTIONS'
+    http_res['Access-Control-Max-Age'] = 1000
+    return http_res
+ 
+
+def blast2(request):
+  return _blast2(request)
+  try:
+    return _blast2(request)
+  except Exception as e:
+    print str(e)
+    raise(e)
+

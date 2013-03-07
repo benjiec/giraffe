@@ -4,6 +4,7 @@ import views
 
 urlpatterns = patterns('',
   url(r'analyze/$', views.post, name='giraffe-analyze'),
+  url(r'blast2/$', views.blast2, name='blast2'),
   (r'^demo/$', direct_to_template, { 'template' : 'giraffe/analyze.html' }),
   (r'^demo/draw/$', direct_to_template, { 'template' : 'giraffe/draw.html' }),
 )

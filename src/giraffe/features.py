@@ -291,3 +291,62 @@ def find_restriction_sites(sequence):
 
   return cutter_list
 
+
+
+##################################
+# BLAST2
+#
+
+def blast2(subject, query):
+  subject = clean_dna_sequence(subject)
+  query = clean_dna_sequence(query)
+
+  with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
+    subject_file = f.name 
+    f.write(">Subject\n%s\n" % (subject,))
+    print 'subject=%s' % (subject,)
+
+  with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
+    query_file = f.name 
+    f.write(">Query\n%s\n" % (query,))
+    print 'query=%s' % (query,)
+
+  outfile = "%s.out.xml" % (query_file,)
+  blast_cl = NcbiblastnCommandline(query=query_file, subject=subject_file,
+                                   evalue=0.001, word_size=6, outfmt=5, out=outfile)
+  cl = str(blast_cl)
+  cl = "%s/%s" % (settings.NCBI_BIN_DIR, cl)
+  r = subprocess.call(cl.split(" "))
+  if r != 0:
+    raise Exception("Blast failed: %s" % (cl,))
+ 
+  res = []
+ 
+  with open(outfile, "r") as f:
+    blast_record = NCBIXML.read(f)
+    for alignment in blast_record.alignments:
+      for hsp in alignment.hsps:
+        #print 'identities %s/%s' % (hsp.identities, len(hsp.query))
+        #print 'qs %s-%s, ms %s-%s' % (hsp.query_start, hsp.query_end, hsp.sbjct_start, hsp.sbjct_end)
+        #print '    '+hsp.query[0:75] + '...'
+        #print '    '+hsp.match[0:75] + '...'
+        #print '    '+hsp.sbjct[0:75] + '...'
+
+        percent = 100.0*hsp.identities/(1.0*len(hsp.sbjct))
+
+        res.append({ "query_start": hsp.query_start,
+                     "query_end": hsp.query_end,
+                     "subject_start": hsp.sbjct_start,
+                     "subject_end": hsp.sbjct_end,
+                     "query": hsp.query,
+                     "match": hsp.match,
+                     "subject": hsp.sbjct, })
+
+  os.unlink(outfile)
+  os.unlink(subject_file)
+  os.unlink(query_file)
+  return res
+
+
+
+
