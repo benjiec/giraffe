@@ -96,7 +96,7 @@
         feature:    1, promoter:   2, primer: 3,
         enzyme:     4, gene:       5, origin: 6,
         regulatory: 7, terminator: 8, custom: 9,
-        orf:       10
+        orf:       10, custom2:   11
     };
 
     // For dealing with the SVG syntax
@@ -131,6 +131,7 @@
         origin:  "#333",
         enzyme:  "#00c",
         custom:  "#ffa500",
+        custom2: "#d0d",
         orf:     "#00c8c8"
     };
 
@@ -345,6 +346,9 @@ window.GiraffeDraw2 = function () {
                     break;
                 case ft.custom:
                     thi$.color = colors.custom;
+                    break;
+                case ft.custom2:
+                    thi$.color = colors.custom2;
                     break;
                 case ft.terminator:
                     thi$.color = colors.primer;
