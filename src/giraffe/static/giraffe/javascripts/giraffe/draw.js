@@ -93,10 +93,10 @@
 
     // Feature types: numerical codes to names
     ft = {
-        feature:    1, promoter:   2, primer: 3,
-        enzyme:     4, gene:       5, origin: 6,
-        regulatory: 7, terminator: 8, custom: 9,
-        orf:       10, custom2:   11
+        feature:    1, promoter:   2, primer:   3,
+        enzyme:     4, gene:       5, origin:   6,
+        regulatory: 7, terminator: 8, custom:   9,
+        orf:       10, custom2:   11, custom3: 12
     };
 
     // For dealing with the SVG syntax
@@ -130,9 +130,10 @@
         primer:  "#090",
         origin:  "#333",
         enzyme:  "#00c",
+        orf:     "#00c8c8",
         custom:  "#ffa500",
         custom2: "#d0d",
-        orf:     "#00c8c8"
+        custom3: "#00d",
     };
 
 /**
@@ -349,6 +350,9 @@ window.GiraffeDraw2 = function () {
                     break;
                 case ft.custom2:
                     thi$.color = colors.custom2;
+                    break;
+                case ft.custom3:
+                    thi$.color = colors.custom3;
                     break;
                 case ft.terminator:
                     thi$.color = colors.primer;
