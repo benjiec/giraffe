@@ -133,7 +133,7 @@
         orf:     "#00c8c8",
         custom:  "#ffa500",
         custom2: "#d0d",
-        custom3: "#00d",
+        custom3: "#07f",
     };
 
 /**
