@@ -24,7 +24,7 @@
     "pk": 4, 
     "model": "hippo.feature_type", 
     "fields": {
-      "type": "Enzyme"
+      "type": "Restriction Enzyme"
     }
   }, 
   {
