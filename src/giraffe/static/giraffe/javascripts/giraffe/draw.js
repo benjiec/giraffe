@@ -123,19 +123,24 @@
     };
 
     // Feature Colors
-    // TODO: Make this map-specific and an option for this
+    //
+    // Using Kelly's 22 colours of maximum contrast, referenced in
+    // http://eleanormaclure.files.wordpress.com/2011/03/colour-coding.pdf
+    //
+    // Number in comment is the Kelly number
+    //
     colors = {
-        bg_text: "#aaa",
-        plasmid: "#000",
-        feature: "#f00",
-        primer:  "#090",
-        origin:  "#333",
-        enzyme:  "#00c",
-        orf:     "#0cc",
-        custom:  "#fa0",
-        custom2: "#d0d",
-        custom3: "#07f",
-        custom4: "#ddf"
+        bg_text: "#aaa", // white
+        plasmid: "#000", // black
+        feature: "#f00", // red
+        primer:  "#090", // green
+        origin:  "#333", // darkgray
+        enzyme:  "#00c", // blue
+        orf:     "#0cc", // cyan
+        custom:  "#fa0", // gold
+        custom2: "#f8f", // pink
+        custom3: "#07f", // seablue
+        custom4: "#90f"  // purple 
     };
 
 /**
