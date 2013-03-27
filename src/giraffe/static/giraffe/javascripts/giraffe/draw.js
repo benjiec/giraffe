@@ -138,9 +138,9 @@
         enzyme:  "#00c", // blue
         orf:     "#0cc", // cyan
         custom:  "#fa0", // gold
-        custom2: "#f8f", // pink
+        custom2: "#d0d", // pink
         custom3: "#07f", // seablue
-        custom4: "#90f"  // purple 
+        custom4: "#80d"  // purple 
     };
 
 /**
