@@ -93,10 +93,11 @@
 
     // Feature types: numerical codes to names
     ft = {
-        feature:    1, promoter:   2, primer: 3,
-        enzyme:     4, gene:       5, origin: 6,
-        regulatory: 7, terminator: 8, custom: 9,
-        orf:       10
+        feature:    1, promoter:   2, primer:   3,
+        enzyme:     4, gene:       5, origin:   6,
+        regulatory: 7, terminator: 8, custom:   9,
+        orf:       10, custom2:   11, custom3: 12,
+        custom4:   13
     };
 
     // For dealing with the SVG syntax
@@ -122,16 +123,24 @@
     };
 
     // Feature Colors
-    // TODO: Make this map-specific and an option for this
+    //
+    // Using Kelly's 22 colours of maximum contrast, referenced in
+    // http://eleanormaclure.files.wordpress.com/2011/03/colour-coding.pdf
+    //
+    // Number in comment is the Kelly number
+    //
     colors = {
-        bg_text: "#aaa",
-        plasmid: "#000",
-        feature: "#f00",
-        primer:  "#090",
-        origin:  "#333",
-        enzyme:  "#00c",
-        custom:  "#ffa500",
-        orf:     "#00c8c8"
+        bg_text: "#aaa", // white
+        plasmid: "#000", // black
+        feature: "#f00", // red
+        primer:  "#090", // green
+        origin:  "#333", // darkgray
+        enzyme:  "#00c", // blue
+        orf:     "#0cc", // cyan
+        custom:  "#fa0", // gold
+        custom2: "#d0d", // pink
+        custom3: "#07f", // seablue
+        custom4: "#80d"  // purple 
     };
 
 /**
@@ -345,6 +354,15 @@ window.GiraffeDraw2 = function () {
                     break;
                 case ft.custom:
                     thi$.color = colors.custom;
+                    break;
+                case ft.custom2:
+                    thi$.color = colors.custom2;
+                    break;
+                case ft.custom3:
+                    thi$.color = colors.custom3;
+                    break;
+                case ft.custom4:
+                    thi$.color = colors.custom4;
                     break;
                 case ft.terminator:
                     thi$.color = colors.primer;

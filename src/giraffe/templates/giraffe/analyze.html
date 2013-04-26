@@ -1,3 +1,4 @@
+{% load url from future %}
 <!DOCTYPE HTML>
 <html>
 <head>
@@ -64,7 +65,7 @@ jQuery(document).ready(function($){
       gd.read(data0);
       var analyzer = GiraffeAnalyze2($, gd, { 'dom_id': analyzer_dom_id, 'name': 'Sequence' });
 
-      $.post("{% url giraffe-analyze %}",
+      $.post("{% url 'giraffe-analyze' %}",
              { "sequence": seq, "db": db },
              function(data) {
                if (data[2] != data0[2]) {

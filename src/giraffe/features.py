@@ -70,7 +70,7 @@ class Feature_Type_Choices(Constant_Choices):
   FEATURE       = (1,  'Feature')
   PROMOTER      = (2,  'Promoter')
   PRIMER        = (3,  'Primer')
-  ENZYME        = (4,  'Enzyme')
+  ENZYME        = (4,  'Restriction Enzyme')
   GENE          = (5,  'Gene')
   ORIGIN        = (6,  'Origin')
   REGULATORY    = (7,  'Regulatory')
