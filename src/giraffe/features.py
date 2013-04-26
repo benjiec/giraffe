@@ -313,7 +313,12 @@ def blast2(subject, query):
 
   outfile = "%s.out.xml" % (query_file,)
   blast_cl = NcbiblastnCommandline(query=query_file, subject=subject_file,
-                                   evalue=0.001, word_size=6, outfmt=5, out=outfile)
+                                   evalue=0.001, word_size=6,
+                                   # these params were tested to allow gaps in
+                                   # alignments. i.e. large number of bps
+                                   # misaligned or gapped.
+                                   gapextend=4, gapopen=0, reward=2,
+                                   outfmt=5, out=outfile)
   cl = str(blast_cl)
   cl = "%s/%s" % (settings.NCBI_BIN_DIR, cl)
   r = subprocess.call(cl.split(" "))
