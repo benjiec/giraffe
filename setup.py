@@ -28,7 +28,10 @@ setup(
                    },
     zip_safe=False,
     requires=[],
-    install_requires=[],
+    install_requires=[
+      'numpy',
+      'biopython',
+    ],
     classifiers=[
         'Operating System :: OS Independent',
         'Programming Language :: Python',
