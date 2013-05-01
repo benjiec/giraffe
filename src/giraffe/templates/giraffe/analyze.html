@@ -51,17 +51,7 @@ jQuery(document).ready(function($){
     var db = $('#post-form input[name=db]').val();
     if (seq !== undefined && seq.length > 0) {
       var gd = GiraffeDraw2();
-      var data0 = [seq.length,
-                   [{ "show_feature": 1,
-                      "start": 100,
-                      "end": 1000,
-                      "feature": "Test",
-                      "type_id": 9,
-                      "clockwise": true,
-                      "layer": "Custom",
-                      "link": "/giraffe/demo/"
-                    }],
-                   seq];
+      var data0 = [seq.length, [], seq];
       gd.read(data0);
       var analyzer = GiraffeAnalyze2($, gd, { 'dom_id': analyzer_dom_id, 'name': 'Sequence' });
 
