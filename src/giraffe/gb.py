@@ -56,6 +56,8 @@ def parse_genbank(input):
       pass
     elif 'name' in q:
       fn = ' '.join(q['name'])
+    elif 'label' in q:
+      fn = ' '.join(q['label'])
     elif 'note' in q:
       fn = ' '.join(q['note'])
     elif 'standard_name' in q:
