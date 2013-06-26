@@ -1,4 +1,4 @@
-Django >= 1.4
+Django == 1.4.2
 South >= 0.7.2
 
 # BioPython - ORF detection
