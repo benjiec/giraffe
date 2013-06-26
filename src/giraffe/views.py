@@ -2,6 +2,7 @@ from django.http import HttpResponse
 import features
 import orfs
 import json
+import gb
 import httplib
 
 
@@ -12,19 +13,34 @@ def _post(request):
     Response: JSON list of features
     """
 
+    is_gb = False
     db_name = request.REQUEST['db'].strip()
-    sequence = features.clean_dna_sequence(request.REQUEST['sequence'])
 
-    # feature detection
-    feature_list = features.blast(sequence, db_name)
+    sequence = request.REQUEST['sequence']
+    gb_features = []
 
-    # restriction site search
-    cutter_list = features.find_restriction_sites(sequence)
+    # parse genbank
+    if sequence.startswith('LOCUS'):
+      is_gb = True
+      sequence, gb_features = gb.parse_genbank(sequence)
 
-    # ORFs and tags
-    orf_list, tag_list = orfs.detect_orfs_and_tags(sequence)
+    # clean sequence
+    sequence = features.clean_dna_sequence(sequence)
 
-    res = [x.to_dict() for x in feature_list+cutter_list+orf_list+tag_list]
+    feature_list = gb_features
+
+    if not is_gb or ('gbonly' not in request.REQUEST) or request.REQUEST['gbonly'] != '1':
+      # feature detection
+      feature_list += features.blast(sequence, db_name)
+      # restriction site search
+      feature_list += features.find_restriction_sites(sequence)
+      # ORFs and tags
+      orf_list, tag_list = orfs.detect_orfs_and_tags(sequence)
+      feature_list += orf_list
+      feature_list += tag_list
+
+    res = [x.to_dict() for x in feature_list]
+    # print 'returning %s' % (res,)
 
     # now sort everything by start
     res.sort(cmp=lambda x,y:cmp(int(x['start']),int(y['start'])))
@@ -58,7 +74,8 @@ def post(request):
   try:
     return _post(request)
   except Exception as e:
-    print str(e)
+    import traceback, sys
+    traceback.print_exc(file=sys.stdout)
     raise(e)
 
 

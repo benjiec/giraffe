@@ -15,7 +15,7 @@
   </p>
 </div>
 
-<h2>Draw Plasmid Map</h2>
+<h2>Draw Plasmid Map from Raw or Genbank Sequence</h2>
 
 <div id="post-form">
   <input type="hidden" name="db" value="default" />
@@ -44,35 +44,11 @@ jQuery(document).ready(function($){
     $('#'+analyzer_dom_id).empty();
 
     var seq = $('#post-form textarea[name=sequence]').val();
-    seq = seq.replace(/\s+/g,'');
     var db = $('#post-form input[name=db]').val();
     if (seq !== undefined && seq.length > 0) {
-      var gd = GiraffeDraw2();
-      var data0 = [seq.length,
-                   [{ "show_feature": 1,
-                      "start": 100,
-                      "end": 1000,
-                      "feature": "Test",
-                      "type_id": 9,
-                      "clockwise": true,
-                      "layer": "Custom",
-                      "link": "/giraffe/demo/"
-                    }],
-                   seq];
-      gd.read(data0);
-      gd.CircularMap({ 'map_dom_id' : analyzer_dom_id, 'plasmid_name' : 'My Plasmid' })
-
       $.post("{% url 'giraffe-analyze' %}",
              { "sequence": seq, "db": db },
              function(data) {
-               if (data[2] != data0[2]) {
-                 alert("Opps, cannot use original features because sequence has been changed by Giraffe");
-               }
-               else {
-                 for (var i=0; i<data0[1].length; i++) {
-                   data[1].push(data0[1][i]);
-                 }
-               }
                var gd = GiraffeDraw2();
                gd.read(data);
                $('#'+analyzer_dom_id).empty();
