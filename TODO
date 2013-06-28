@@ -1,14 +1,4 @@
-
-Create arbitrary blast DB
-  - Script/example for creating blast DB
-  - How to add links to blast results?
-
-Blast UI
-
-Input list of addition features to blast2 against query - useful for aligning
-seq results
-
----
+Sequence search on analyzer: should handle degenerates
 
 Drawing bug - multiple labels highlighted on mouse over
 
@@ -28,23 +18,10 @@ Add tests
   - JS test digest working correctly with cutter positions, incl EarI
   - JS test for layer control - e.g. Restriction Enzyme
 
-Add examples
-  - Ajax POST
-  - Layers
-
-Add JS helper to initiate POST and merge with existing features
-
 Digest handling improvements
   - Digest handling pushed to BioJS? Take in cutters, produce digests?
   - Linear digest - showing EarI digest even when EarI is across boundary, this is wrong
   - EarI across boundary is considered a cutter in N-cutter analysis, this is wrong
-
-Blast API
-  - Return in order of escore
-  - Getting word_size from params
-  - Need UI widget?
-
-Customize analyzer widget BLAST button - add custom blast buttons
 
 Add back non-cutters analysis, but have to pass this in from backend
 
