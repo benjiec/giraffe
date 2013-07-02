@@ -446,7 +446,7 @@ window.BioJS2 = function(){
 
         for (i = 0; i < features.length; i++) {
             var type = features[i].type;
-            var tran;
+            var tran = undefined;
             if (type == 'CDS' && features[i].clockwise_sequence &&
                 features[i].clockwise_sequence !== '') {
                 if (features[i].clockwise) {
