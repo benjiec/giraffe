@@ -22,7 +22,7 @@ def _post(request):
     # parse genbank
     if sequence.strip().startswith('LOCUS'):
       is_gb = True
-      sequence, gb_features = gb.parse_genbank(sequence)
+      sequence, gb_features = gb.parse_genbank(sequence.lstrip())
 
     # clean sequence
     sequence = features.clean_dna_sequence(sequence)
