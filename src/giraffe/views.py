@@ -20,7 +20,7 @@ def _post(request):
     gb_features = []
 
     # parse genbank
-    if sequence.startswith('LOCUS'):
+    if sequence.strip().startswith('LOCUS'):
       is_gb = True
       sequence, gb_features = gb.parse_genbank(sequence)
 
