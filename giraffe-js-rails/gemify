@@ -1,0 +1,7 @@
+#!/bin/bash
+rm -rf pkg
+chmod -R a+rX .
+mkdir -p pkg
+gem build *.gemspec
+mv *.gem pkg
+gem inabox pkg/*.gem
