@@ -8,7 +8,7 @@ import os
 # Sequence cleaning
 #
 
-def clean_dna_sequence(sequence, strict=False, alphabet=None):
+def clean_sequence(sequence, strict=False, alphabet=None):
   sequence = sequence.strip()
   sequence = re.sub(r'\s+', '', sequence)
   if strict: # throws exception if DNA is not valid
@@ -148,15 +148,15 @@ class Blast_Accession(object):
     self.feature_length = int(a[2])
 
 
-from Bio.Blast.Applications import NcbiblastnCommandline
+from Bio.Blast.Applications import NcbiblastnCommandline, NcbiblastxCommandline
 from Bio.Blast import NCBIXML
 import tempfile
 import subprocess
 
-def blast(sequence, db):
+def blast(sequence, dbobj, protein=False):
   infile = None
   feature_list = []
-  input = clean_dna_sequence(sequence)
+  input = clean_sequence(sequence)
   input2 = input+input
 
   with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
@@ -164,14 +164,19 @@ def blast(sequence, db):
     f.write(">Query\n%s\n" % (input2,))
 
   outfile = "%s.out.xml" % (infile,)
-  blast_cl = NcbiblastnCommandline(query=infile, db="%s/%s" % (settings.NCBI_DATA_DIR, db),
-                                   evalue=0.001, word_size=6, outfmt=5, out=outfile)
+  if protein:
+    blast_cl = NcbiblastxCommandline(query=infile, db="%s" % (dbobj.protein_db_name(),),
+                                     evalue=0.001, word_size=3, outfmt=5, out=outfile)
+  else:
+    blast_cl = NcbiblastnCommandline(query=infile, db="%s" % (dbobj.dna_db_name(),),
+                                     evalue=0.001, word_size=6, outfmt=5, out=outfile)
+
   cl = str(blast_cl)
   cl = "%s/%s" % (settings.NCBI_BIN_DIR, cl)
   r = subprocess.call(cl.split(" "))
   if r != 0:
     raise Exception("Blast failed: %s" % (cl,))
-  
+
   with open(outfile, "r") as f:
     blast_record = NCBIXML.read(f)
     for alignment in blast_record.alignments:
@@ -249,7 +254,7 @@ MyEnzymes = RestrictionBatch([x for x in _MyEnzymes if x.elucidate().find('^') >
 
 
 def find_restriction_sites(sequence):
-  input_seq = clean_dna_sequence(sequence)
+  input_seq = clean_sequence(sequence)
   input2 = Seq(input_seq+input_seq)
   r = MyEnzymes.search(input2)
   cutter_list = []
@@ -298,18 +303,18 @@ def find_restriction_sites(sequence):
 #
 
 def blast2(subject, query):
-  subject = clean_dna_sequence(subject)
-  query = clean_dna_sequence(query)
+  subject = clean_sequence(subject)
+  query = clean_sequence(query)
 
   with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
     subject_file = f.name 
     f.write(">Subject\n%s\n" % (subject,))
-    print 'subject=%s' % (subject,)
+    #print 'subject=%s' % (subject,)
 
   with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
     query_file = f.name 
     f.write(">Query\n%s\n" % (query,))
-    print 'query=%s' % (query,)
+    #print 'query=%s' % (query,)
 
   outfile = "%s.out.xml" % (query_file,)
   blast_cl = NcbiblastnCommandline(query=query_file, subject=subject_file,

@@ -13,8 +13,11 @@ def _post(request):
     Response: JSON list of features
     """
 
+    from hippo.models import Feature_Database
+
     is_gb = False
     db_name = request.REQUEST['db'].strip()
+    db = Feature_Database.objects.get(name=db_name)
 
     sequence = request.REQUEST['sequence']
     gb_features = []
@@ -25,13 +28,14 @@ def _post(request):
       sequence, gb_features = gb.parse_genbank(sequence.lstrip())
 
     # clean sequence
-    sequence = features.clean_dna_sequence(sequence)
+    sequence = features.clean_sequence(sequence)
 
     feature_list = gb_features
 
     if not is_gb or ('gbonly' not in request.REQUEST) or request.REQUEST['gbonly'] != '1':
       # feature detection
-      feature_list += features.blast(sequence, db_name)
+      feature_list += features.blast(sequence, db, protein=False)
+      feature_list += features.blast(sequence, db, protein=True)
       # restriction site search
       feature_list += features.find_restriction_sites(sequence)
       # ORFs and tags
@@ -53,10 +57,10 @@ def _post(request):
         http_res = HttpResponse(j,mimetype="text/javascript",status=httplib.OK)
 
     else:
-	# technically we should be returning "application/json", but in that
-	# case browsers force user to download into a file, and for debugging
-	# we want to be able to see the JSON list in browser. looks like most
-	# browsers will handle JSON sent back as text/html anyways.
+        # technically we should be returning "application/json", but in that
+        # case browsers force user to download into a file, and for debugging
+        # we want to be able to see the JSON list in browser. looks like most
+        # browsers will handle JSON sent back as text/html anyways.
         if request.is_ajax():
             http_res = HttpResponse(j,mimetype="application/json",status=httplib.OK)
         else:
@@ -90,8 +94,8 @@ def _blast2(request):
       res = []
 
     else:
-      subject = features.clean_dna_sequence(request.REQUEST['subject'])
-      query = features.clean_dna_sequence(request.REQUEST['query'])
+      subject = features.clean_sequence(request.REQUEST['subject'])
+      query = features.clean_sequence(request.REQUEST['query'])
       res = features.blast2(subject, query)
 
     j = json.JSONEncoder().encode(res)
