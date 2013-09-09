@@ -25,28 +25,7 @@ It is now maintained by Benjie Chen.
 You can use Giraffe Javascripts independently of the Django service, to
 visualize a sequence you already have a list of features for.
 
-Django examples: see src/giraffe/templates/giraffe/{analyze,draw}.html.
-
-Rails: add the following to your Gemfile
-
-```
-git "git://github.com/benjiec/giraffe.git" do
-  gem "giraffe-js-rails"
-end
-```
-
-Then for your Javascript asset file (e.g. vendor/assets/javascripts/vendor.js), include
-
-```
-//= require giraffe-js
-```
-
-(If you need jQuery UI tooltip, which comes with jQuery UI 1.9+, use
-giraffe-js-with-tooltip).  And for your CSS asset file (e.g. vendor/assets/stylesheets/vendor.css), include
-
-```
-*= require giraffe-js
-```
+See src/giraffe/templates/giraffe/{analyze,draw}.html.
 
 Documentation: limited, but src/giraffe/static/javascripts/giraffe/README
 describes how to use just the Javascript plasmid drawing widget.
