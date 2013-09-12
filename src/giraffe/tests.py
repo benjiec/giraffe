@@ -1,8 +1,84 @@
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 from hippo.models import Feature, Feature_Type, Feature_Database
-import json
+import json, random
 
+
+from giraffe.features import blast
+
+class BlastTest(TestCase):
+
+  def setUp(self):
+    ft_gene = Feature_Type(type='Gene')
+    ft_gene.save()
+
+    self.dna = 'ATTGCGGATCGCGAATGCGATCG'
+    self.pro = 'MKKKAPSI'
+    self.pro_dna = 'ATGAAGAAGAAAGCACCAAGCATA'
+
+    self.feature1 = Feature(type=ft_gene, name='G1', sequence=self.dna, dna_or_protein=1)
+    self.feature1.save()
+
+    self.feature2 = Feature(type=ft_gene, name='G2', sequence=self.pro, dna_or_protein=2)
+    self.feature2.save()
+
+    self.feature_db = Feature_Database(name='test')
+    self.feature_db.save()
+    self.feature_db.features.add(self.feature1, self.feature2)
+
+
+  def test_blast(self):
+    self.feature_db.build()
+
+    query = 'G'*100+self.dna+'A'*40
+    feature_list = blast(query, self.feature_db)
+
+    self.assertEquals(len(feature_list), 1)
+    self.assertEquals(feature_list[0].name, self.feature1.name)
+    self.assertEquals(feature_list[0].start, 101)
+    self.assertEquals(feature_list[0].end, 100+len(self.dna))
+    self.assertEquals(feature_list[0].clockwise, True)
+
+  def test_blast_evalue_threshold(self):
+    self.feature_db.build()
+
+    query = 'G'*100+self.dna+'A'*40
+    feature_list = blast(query, self.feature_db)
+    self.assertEquals(len(feature_list), 1)
+    feature_list = blast(query, self.feature_db, evalue_threshold=1E-50)
+    self.assertEquals(len(feature_list), 0)
+
+  def test_blast_identity_threshold(self):
+    self.feature_db.build()
+
+    q = self.dna
+    # make two changes
+    q = q[0:3]+'C'+q[4:6]+'C'+q[7:]
+    self.assertEquals(len(q), len(self.dna))
+    query = 'G'*100+q+'A'*40
+
+    feature_list = blast(query, self.feature_db, identity_threshold=None)
+    self.assertEquals(len(feature_list), 1)
+    self.assertEquals(feature_list[0].start, 101)
+    self.assertEquals(feature_list[0].end, 100+len(self.dna))
+    self.assertEquals(feature_list[0].clockwise, True)
+
+    feature_list = blast(query, self.feature_db, identity_threshold=0.99)
+    self.assertEquals(len(feature_list), 0)
+ 
+  def test_blast_feature_threshold(self):
+    self.feature_db.build()
+
+    query = 'G'*100+self.dna[0:12]+'A'*40
+    feature_list = blast(query, self.feature_db, feature_threshold=None)
+    self.assertEquals(len(feature_list), 1)
+    self.assertEquals(feature_list[0].start, 101)
+    self.assertEquals(feature_list[0].end, 100+12)
+    self.assertEquals(feature_list[0].clockwise, True)
+
+    feature_list = blast(query, self.feature_db, feature_threshold=0.8)
+    self.assertEquals(len(feature_list), 0)
+ 
 
 class IntegrationTest(TestCase):
 

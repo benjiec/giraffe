@@ -208,6 +208,15 @@ def blast(sequence, dbobj, protein=False,
            1.0*hsp.identities/len(hsp.sbjct) < identity_threshold:
           continue
 
+        if hsp.sbjct_end > hsp.sbjct_start:
+          clockwise = True
+          hit_start = hsp.sbjct_start
+          hit_end = hsp.sbjct_end
+        else:
+          clockwise = False
+          hit_end = hsp.sbjct_start
+          hit_start = hsp.sbjct_end
+
         # check feature threshold
         if feature_threshold is not None and \
            1.0*(1+abs(hit_end-hit_start))/accession.feature_length < feature_threshold:
@@ -219,15 +228,6 @@ def blast(sequence, dbobj, protein=False,
         start = hsp.query_start
         end = hsp.query_end
         end = end % len(input)
-
-        if hsp.sbjct_end > hsp.sbjct_start:
-          clockwise = True
-          hit_start = hsp.sbjct_start
-          hit_end = hsp.sbjct_end
-        else:
-          clockwise = False
-          hit_end = hsp.sbjct_start
-          hit_start = hsp.sbjct_end
 
         feature = alignment.hit_def
 
