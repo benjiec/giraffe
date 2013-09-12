@@ -31,7 +31,7 @@ class Feature(models.Model):
   name = models.CharField(max_length=32,db_index=True)
   sequence = models.TextField()
   dna_or_protein = models.IntegerField('DNA or Protein',
-                                       choices=(('DNA', DNA), ('Protein', PROTEIN)), default=DNA)
+                                       choices=((DNA, 'DNA'), (PROTEIN, 'Protein')), default=DNA)
   last_modified = models.DateTimeField(auto_now=True,db_index=True)
 
   def save(self, *args, **kwargs):
