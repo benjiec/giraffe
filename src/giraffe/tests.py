@@ -16,10 +16,12 @@ class BlastTest(TestCase):
     self.pro = 'MKKKAPSI'
     self.pro_dna = 'ATGAAGAAGAAAGCACCAAGCATA'
 
-    self.feature1 = Feature(type=ft_gene, name='G1', sequence=self.dna, dna_or_protein=1)
+    self.feature1 = Feature(type=ft_gene, name='G1', sequence=self.dna)
+    self.feature1.as_dna()
     self.feature1.save()
 
-    self.feature2 = Feature(type=ft_gene, name='G2', sequence=self.pro, dna_or_protein=2)
+    self.feature2 = Feature(type=ft_gene, name='G2', sequence=self.pro)
+    self.feature2.as_protein()
     self.feature2.save()
 
     self.feature_db = Feature_Database(name='test')
@@ -97,10 +99,12 @@ class IntegrationTest(TestCase):
     self.pro = 'MKKKAPSI'
     self.pro_dna = 'ATGAAGAAGAAAGCACCAAGCATA'
 
-    self.feature1 = Feature(type=ft_gene, name='G1', sequence=self.dna, dna_or_protein=1)
+    self.feature1 = Feature(type=ft_gene, name='G1', sequence=self.dna)
+    self.feature1.as_dna()
     self.feature1.save()
 
-    self.feature2 = Feature(type=ft_gene, name='G2', sequence=self.pro, dna_or_protein=2)
+    self.feature2 = Feature(type=ft_gene, name='G2', sequence=self.pro)
+    self.feature2.as_protein()
     self.feature2.save()
 
     self.feature_db = Feature_Database(name='test')
