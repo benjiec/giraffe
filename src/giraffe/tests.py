@@ -88,6 +88,26 @@ class BlastTest(TestCase):
     self.assertEquals(len(feature_list), 1)
     self.assertEquals(feature_list[0].feature.id, self.feature1.id)
 
+  def test_returns_one_result_from_across_circular_boundary(self):
+    self.feature_db.build()
+    q = 'G'*100+self.dna+'A'*40
+    query = q[110:]+q[0:110]
+    feature_list = blast(query, self.feature_db)
+    # if we don't remove truncated features across circular boundary, we'd see
+    # 2 results, one for truncated feature, one for full feature
+    self.assertEquals(len(feature_list), 1)
+
+  def test_returns_correct_coordinates_across_circular_boundary(self):
+    self.feature_db.build()
+
+    q = 'G'*100+self.dna+'A'*40
+    query = q[110:]+q[0:110]
+
+    feature_list = blast(query, self.feature_db)
+    self.assertEquals(feature_list[0].start, len(q)-10+1)
+    self.assertEquals(feature_list[0].end, len(self.dna)-10)
+    self.assertEquals(feature_list[0].clockwise, True)
+
 
 class IntegrationTest(TestCase):
 

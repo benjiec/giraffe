@@ -246,7 +246,27 @@ def blast(sequence, dbobj, protein=False,
 
   os.unlink(outfile)
   os.unlink(infile)
-  return feature_list
+
+  # remove truncated features across circular boundary
+  filtered = []
+  for f in feature_list:
+    trumped = False
+    if f.start == 1:
+      # see if this feature is trumped by another one
+      for other_f in feature_list:
+        # same ending, direction, feature, but other_f is across circular
+        # boundary (start > end)
+        if other_f.start != f.start and \
+           other_f.end == f.end and \
+           other_f.clockwise == f.clockwise and \
+           other_f.feature_id == f.feature_id and \
+           other_f.start > other_f.end:
+          trumped = True
+          break
+    if not trumped:
+      filtered.append(f)
+
+  return filtered
 
 
 
