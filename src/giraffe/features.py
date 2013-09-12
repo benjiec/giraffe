@@ -153,7 +153,23 @@ from Bio.Blast import NCBIXML
 import tempfile
 import subprocess
 
-def blast(sequence, dbobj, protein=False):
+def blast(sequence, dbobj, protein=False,
+          identity_threshold=0.85, evalue_threshold=0.001, feature_threshold=None):
+  """
+  Blast sequence against specified feature database, using blastn if
+  protein=False (default), or blastx if protein=True.
+
+  identity_threshold: only return results with identity rate greater than this
+  threshold. Can be None. Default is 0.85.
+
+  evalue_threshold: only return results with evalue smaller than this
+  threshold. Default is 0.001.
+
+  feature_threshold: only return results that span at least this amount of a
+  feature. Can be None (default). E.g. if set to 0.99, only results spanning an
+  entire feature are returned.
+  """
+
   infile = None
   feature_list = []
   input = clean_sequence(sequence)
@@ -166,10 +182,10 @@ def blast(sequence, dbobj, protein=False):
   outfile = "%s.out.xml" % (infile,)
   if protein:
     blast_cl = NcbiblastxCommandline(query=infile, db="%s" % (dbobj.protein_db_name(),),
-                                     evalue=0.001, word_size=3, outfmt=5, out=outfile)
+                                     evalue=evalue_threshold, word_size=3, outfmt=5, out=outfile)
   else:
     blast_cl = NcbiblastnCommandline(query=infile, db="%s" % (dbobj.dna_db_name(),),
-                                     evalue=0.001, word_size=6, outfmt=5, out=outfile)
+                                     evalue=evalue_threshold, word_size=6, outfmt=5, out=outfile)
 
   cl = str(blast_cl)
   cl = "%s/%s" % (settings.NCBI_BIN_DIR, cl)
@@ -182,19 +198,28 @@ def blast(sequence, dbobj, protein=False):
     for alignment in blast_record.alignments:
       accession = Blast_Accession(alignment.accession)
       for hsp in alignment.hsps:
-        #print "seq %s %s %s" % (accession.type, accession.feature_length, alignment.hit_def,)
-        #print 'identities %s/%s' % (hsp.identities, len(hsp.query))
-        #print 'qs %s-%s, ms %s-%s' % (hsp.query_start, hsp.query_end, hsp.sbjct_start, hsp.sbjct_end)
-        #print '    '+hsp.query[0:75] + '...'
-        #print '    '+hsp.match[0:75] + '...'
-        #print '    '+hsp.sbjct[0:75] + '...'
 
-        percent = 100.0*hsp.identities/(1.0*len(hsp.sbjct))
-        if percent < 85: # this is some what arbitrary...
+        # since we doubled up the input, ignore hits starting after the input
+        if hsp.query_start > len(input):
           continue
+
+        # check identity threshold
+        if identity_threshold is not None and \
+           1.0*hsp.identities/len(hsp.sbjct) < identity_threshold:
+          continue
+
+        # check feature threshold
+        if feature_threshold is not None and \
+           1.0*(1+abs(hit_end-hit_start))/accession.feature_length < feature_threshold:
+          continue
+
+        # print "hit %s evalue %s" % (alignment.hit_def, hsp.expect)
+        # print "  query %s-%s, sbjct %s-%s" % (hsp.query_start, hsp.query_end, hsp.sbjct_start, hsp.sbjct_end)
 
         start = hsp.query_start
         end = hsp.query_end
+        end = end % len(input)
+
         if hsp.sbjct_end > hsp.sbjct_start:
           clockwise = True
           hit_start = hsp.sbjct_start
@@ -205,14 +230,13 @@ def blast(sequence, dbobj, protein=False):
           hit_start = hsp.sbjct_end
 
         feature = alignment.hit_def
+
         if hit_start != 1 or hit_end != accession.feature_length:
           feature = '%s (%s-%s/%s)' % (feature, hit_start, hit_end, accession.feature_length)
 
-        if start <= len(input):
-          end = end % len(input)
-          f = Aligned_Feature(feature, alignment.hit_def, start, end, clockwise, accession.type,
-                              hsp.query, hsp.match, hsp.sbjct)
-          feature_list.append(f)
+        f = Aligned_Feature(feature, alignment.hit_def, start, end, clockwise, accession.type,
+                            hsp.query, hsp.match, hsp.sbjct)
+        feature_list.append(f)
 
   os.unlink(outfile)
   os.unlink(infile)
@@ -336,18 +360,11 @@ def blast2(subject, query):
     blast_record = NCBIXML.read(f)
     for alignment in blast_record.alignments:
       for hsp in alignment.hsps:
-        #print 'identities %s/%s' % (hsp.identities, len(hsp.query))
-        #print 'qs %s-%s, ms %s-%s' % (hsp.query_start, hsp.query_end, hsp.sbjct_start, hsp.sbjct_end)
-        #print '    '+hsp.query[0:75] + '...'
-        #print '    '+hsp.match[0:75] + '...'
-        #print '    '+hsp.sbjct[0:75] + '...'
-
-        percent = 100.0*hsp.identities/(1.0*len(hsp.sbjct))
-
         res.append({ "query_start": hsp.query_start,
                      "query_end": hsp.query_end,
                      "subject_start": hsp.sbjct_start,
                      "subject_end": hsp.sbjct_end,
+                     "evalue": hsp.expect,
                      "query": hsp.query,
                      "match": hsp.match,
                      "subject": hsp.sbjct, })

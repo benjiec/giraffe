@@ -88,6 +88,7 @@ class IntegrationTest(TestCase):
     self.assertItemsEqual(res, [
       { "subject_start": 1, "subject_end": 22,
         "query_start": 1, "query_end": 22,
+        "evalue": 5.81644e-07,
           "query": "ATTGCGGATCGCGAATGCGATC",
           "match": "||||||||||||||||||||||",
         "subject": "ATTGCGGATCGCGAATGCGATC" },

@@ -11,6 +11,12 @@ Hippo and Giraffe can be used together to construct database of sequence
 features, detect features in plasmid sequences, and visualize the features on a
 plasmid map. Giraffe can also parse features from a GenBank input sequence.
 
+Hippo and Giraffe provide a convenient way to use Blast for your own
+application. You can build Blast databases using Hippo, then use Giraffe to
+blast query sequence against the database. Hippo offers a Django admin UI to
+manage the blast DB, while Giraffe handles calling blast, parsing blast
+results, and visualizing detected features.
+
 This is version 2 of the distribution, which is significantly different from
 version 1 in many ways. If you want version 1, checkout the v1.1 branch of the
 repository.
@@ -71,11 +77,36 @@ db=default&sequence=your_dna_sequence_or_genbank_sequence_here
 
 This will return a JSON array of [sequence_len, array of features, sequence].
 
+Programmatically, you can construct new blast databases using Hippo. E.g.
+
+```
+from hippo.models import Feature, Feature_Type, Feature_Database
+db = Feature_Database(name='my_db')
+db.save()
+ft = Feature_Type.objects.get(type='Promoter')
+feature = Feature(type=ft, name='Promoter1', sequence='AGCTATTTCGGAGTCGGCGATTACGATCGGCGATCG')
+feature.save()
+db.features.add(feature)
+db.build()
+```
+
+You can then query against database. E.g.
+
+```
+from hippo.models import Feature_Database
+from giraffe.features import blast
+
+db = Feature_Database.objects.get(name='my_db')
+query = '...' # some query sequence
+features = blast(query, db)
+```
+
 
 ### Hippo as a BLAST frontend
 
 Use Django admin to add features, group features into databases. Use the
 build_blastdb django management command to build your databases, then Giraffe
-can use the databases for feature detection.
+can use the databases for feature detection. Alternatively, call the
+```build``` method on a ```Feature_Database object``` directly.
 
 
