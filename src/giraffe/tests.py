@@ -26,7 +26,6 @@ class BlastTest(TestCase):
     self.feature_db.save()
     self.feature_db.features.add(self.feature1, self.feature2)
 
-
   def test_blast(self):
     self.feature_db.build()
 
@@ -79,6 +78,14 @@ class BlastTest(TestCase):
     feature_list = blast(query, self.feature_db, feature_threshold=0.8)
     self.assertEquals(len(feature_list), 0)
  
+  def test_get_feature_from_blast_result(self):
+    self.feature_db.build()
+
+    query = 'G'*100+self.dna+'A'*40
+    feature_list = blast(query, self.feature_db)
+    self.assertEquals(len(feature_list), 1)
+    self.assertEquals(feature_list[0].feature.id, self.feature1.id)
+
 
 class IntegrationTest(TestCase):
 

@@ -116,16 +116,22 @@ class Detected_Feature_Base(object):
 
 class Aligned_Feature(Detected_Feature_Base):
 
-  def __init__(self, name, label, start, end, clockwise, type, query, match, subject):
+  def __init__(self, name, label, start, end, clockwise, type, query, match, subject, feature_id):
     super(Aligned_Feature, self).__init__(name, label, start, end, clockwise, type)
     self.query = query
     self.match = match
     self.subject = subject
+    self.feature_id = feature_id
 
   def to_dict(self):
     r = super(Aligned_Feature, self).to_dict()
     r['alignment'] = { 'query': self.query, 'match': self.match, 'subject': self.subject }
     return r
+
+  @property
+  def feature(self):
+    from hippo.models import Feature
+    return Feature.objects.get(pk=self.feature_id)
 
 
 
@@ -235,7 +241,7 @@ def blast(sequence, dbobj, protein=False,
           feature = '%s (%s-%s/%s)' % (feature, hit_start, hit_end, accession.feature_length)
 
         f = Aligned_Feature(feature, alignment.hit_def, start, end, clockwise, accession.type,
-                            hsp.query, hsp.match, hsp.sbjct)
+                            hsp.query, hsp.match, hsp.sbjct, accession.feature_id)
         feature_list.append(f)
 
   os.unlink(outfile)
