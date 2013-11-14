@@ -1,25 +1,19 @@
 ### Sequence Feature Detection and Mapping
 
-This software is mostly divided into two parts: Giraffe and Hippo. Giraffe is a
-set of Javascripts that visualize sequences and sequence features, as well as a
-Django/Python program to detect ORFs, restriction sites, and features from a
-sequence. You can use the Javascripts independently from the Django program as
-well. Hippo is a Django/Python frontend for managing NCBI Blast databases; these
-databases are used by Giraffe when detecting features.
-
-Hippo and Giraffe can be used together to construct database of sequence
-features, detect features in plasmid sequences, and visualize the features on a
-plasmid map. Giraffe can also parse features from a GenBank input sequence.
+This repository consists of two tools: Giraffe and Hippo. Giraffe includes a
+set of Javascripts that visualize sequences and sequence features, and a Django
+app that detects features, restriction sites, and ORFs from a sequence. You can
+use the Javascripts independently from the Django program. Hippo is a Django
+frontend for managing NCBI blast databases. User can create sequences, assign
+them to databases, and use Django management commands to build NCBI blast
+databases. Giraffe uses NCBI blast databases, for example, to detect features
+in a sequence.
 
 Hippo and Giraffe provide a convenient way to use Blast for your own
-application. You can build Blast databases using Hippo, then use Giraffe to
+application. You can build blast databases using Hippo, then use Giraffe to
 blast query sequence against the database. Hippo offers a Django admin UI to
 manage the blast DB, while Giraffe handles calling blast, parsing blast
 results, and visualizing detected features.
-
-This is version 2 of the distribution, which is significantly different from
-version 1 in many ways. If you want version 1, checkout the v1.1 branch of the
-repository.
 
 This software was originally written by Misha Wolfson and Benjie Chen,
 copyrighted by Addgene, and released under the MIT License. See LICENSE file.
