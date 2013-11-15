@@ -15,8 +15,8 @@ class Feature_Type(models.Model):
   def save(self, *args, **kwargs):
     if self.type not in giraffe.features.Feature_Type_Choices.labels():
       raise Exception("Invalid type: %s, expecting one of %s" % (
-                        self.type,
-                        ' '.join(giraffe.features.Feature_Type_Choices.labels())))
+                      self.type,
+                      ' '.join(giraffe.features.Feature_Type_Choices.labels())))
     return super(Feature_Type, self).save(*args, **kwargs)
 
   class Meta:
