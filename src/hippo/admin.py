@@ -25,7 +25,7 @@ admin.site.register(models.Feature, FeatureAdmin)
 class FeatureDatabaseAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, *args, **kwargs):
-      return False
+        return False
 
     def delete_view(self, request, object_id, extra_context=None):
         raise PermissionDenied

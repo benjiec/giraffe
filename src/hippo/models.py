@@ -13,7 +13,7 @@ class Feature_Type(models.Model):
 
     def save(self):
         if self.type not in giraffe.features.Feature_Type_Choices.labels():
-          raise Exception("Invalid type: %s, expecting one of %s" % (
+            raise Exception("Invalid type: %s, expecting one of %s" % (
                             self.type,
                             ' '.join(giraffe.features.Feature_Type_Choices.labels())))
 
@@ -46,7 +46,7 @@ class Feature_Database(models.Model):
     last_built = models.DateTimeField(null=True,blank=True)
 
     def __unicode__(self):
-       return self.name
+        return self.name
 
     class Meta:
         verbose_name = "Feature Database"
