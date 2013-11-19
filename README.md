@@ -1,9 +1,9 @@
 ### Sequence Feature Detection and Mapping
 
 This repository consists of two tools: Giraffe and Hippo. Giraffe includes a
-set of Javascripts that visualize sequences and sequence features, and a Django
+set of javascripts that visualize sequences and sequence features, and a Django
 app that detects features, restriction sites, and ORFs from a sequence. You can
-use the Javascripts independently from the Django program. Hippo is a Django
+use the javascripts independently from the Django program. Hippo is a Django
 frontend for managing NCBI blast databases. User can create sequences, assign
 them to databases, and use Django management commands to build NCBI blast
 databases. Giraffe uses NCBI blast databases, for example, to detect features
@@ -22,7 +22,7 @@ It is now maintained by Benjie Chen.
 
 ### Giraffe - Visualization
 
-You can use Giraffe Javascripts independently of the Django service, to
+You can use Giraffe javascripts independently of the Django service, to
 visualize a sequence you already have a list of features for.
 
 See src/giraffe/templates/giraffe/{analyze,draw}.html.
@@ -36,6 +36,7 @@ Requirements:
     provision a Vagrant instance, e.g.)
 
   * Python requirements: pip install -r requirements.txt
+    (Currently supports Django 1.5 or higher)
 
   * NCBI: install NCBI Blast toolkit (this takes awhile): cd ncbi; . install
 
