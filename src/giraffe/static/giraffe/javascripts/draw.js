@@ -96,8 +96,8 @@
         feature:    1, promoter:   2, primer:   3,
         enzyme:     4, gene:       5, origin:   6,
         regulatory: 7, terminator: 8, custom:   9,
-        orf:       10, custom2:   11, custom3: 12,
-        custom4:   13
+        orf:       10, protein:   11, custom2: 12,
+        custom3:   13, custom4:   14
     };
 
     // For dealing with the SVG syntax

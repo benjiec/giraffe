@@ -65,7 +65,9 @@ class Constant_Choices:
 
 
 class Feature_Type_Choices(Constant_Choices):
-  # these have to match with Giraffe value IDs
+
+  #
+  # FOLLOWING VALUES MUST MATCH THOSE IN static/giraffe/javascripts/draw.js
   #
   FEATURE       = (1,  'Feature')
   PROMOTER      = (2,  'Promoter')
@@ -78,6 +80,12 @@ class Feature_Type_Choices(Constant_Choices):
   CUSTOM        = (9,  'Custom')
   ORF           = (10, 'Orf')
   PROTEIN       = (11, 'Protein')
+  CUSTOM2       = (12, 'Custom2')
+  CUSTOM3       = (13, 'Custom3')
+  CUSTOM4       = (14, 'Custom4')
+  #
+  # ABOVE VALUES MUST MATCH THOSE IN static/giraffe/javascripts/draw.js
+  #
 
   @staticmethod
   def labels():
