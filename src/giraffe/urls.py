@@ -1,11 +1,11 @@
-from django.conf.urls.defaults import *
-from django.views.generic.simple import direct_to_template
+from django.conf.urls import patterns, include, url
+from django.views.generic.base import TemplateView
 import views
 
 urlpatterns = patterns('',
   url(r'analyze/$', views.post, name='giraffe-analyze'),
   url(r'blast2/$', views.blast2, name='blast2'),
-  (r'^demo/$', direct_to_template, { 'template' : 'giraffe/analyze.html' }),
-  (r'^demo/draw/$', direct_to_template, { 'template' : 'giraffe/draw.html' }),
+  (r'^demo/$', TemplateView.as_view(template_name='giraffe/analyze.html')),
+  (r'^demo/draw/$', TemplateView.as_view(template_name='giraffe/draw.html')),
 )
 
