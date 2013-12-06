@@ -238,7 +238,7 @@ window.GiraffeAnalyze2 = function ($,gd,options) {
             $('<p id="giraffe-map-help" '+
               ' class="giraffe-help giraffe-hide '+
                       'ui-widget ui-corner-all ui-widget-content">'+
-              'Click on a feature label or feature to highlight DNA sequence.'+
+              'Click on a feature label or feature to highlight DNA sequence. Shift-click to copy sequence.'+
               '</p>');
 
 
@@ -1287,7 +1287,7 @@ window.GiraffeAnalyze2 = function ($,gd,options) {
       }
     }
 
-    function map_feature_click_callback(feature) {
+    function map_feature_click_callback(feature, evt) {
         var bp; // Start and end of feature
         var name = feature.name(); // Tag to display
 
@@ -1303,6 +1303,10 @@ window.GiraffeAnalyze2 = function ($,gd,options) {
 
         sequence_viewer_bp_event_highlight(bp,name,feature.link());
         show_alignment(feature);
+        if (evt.shiftKey) {
+          var selected_seq = sequence.substring(bp[0]-1, bp[1]-1+1);
+          prompt("Use Ctrl/Cmd-C to copy the following sequence:", selected_seq.sequence());
+        }
     }
 
     function full_widget() {
