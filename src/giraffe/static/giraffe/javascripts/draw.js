@@ -446,9 +446,9 @@ window.GiraffeDraw2 = function () {
         };
 
         // Toggle solid/light upon click
-        thi$.click = function(event) {
+        thi$.click = function(evt) {
             if (this.map.feature_click_callback) {
-                this.map.feature_click_callback(basic_feature);
+                this.map.feature_click_callback(basic_feature, evt);
             }
             /* benjie: don't do this for now...
             else {
