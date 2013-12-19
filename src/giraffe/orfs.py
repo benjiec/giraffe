@@ -32,47 +32,36 @@ def detect_orfs_and_tags(dna):
 
     for strand,nuc in [(+1,seq), (-1,seq.reverse_complement())]:
         for frame in range(3):
-            #print 'strand '+str(strand)+' frame '+str(frame)
-
             trans = str(nuc[frame:].translate(trans_table))
             trans_len = len(trans)
             aa_start = 0
             aa_end = 0
 
-            #print trans
-            #print 'trans_len is '+str(trans_len)
-
-	    # go through the translation and find end codons that follow a
-	    # start codon.
+            # go through the translation and find end codons that follow a
+            # start codon.
             while aa_start < trans_len and aa_start < aa_len:
                 aa_end = trans.find("*", aa_start)
-                #print 'search for * from '+str(aa_start)+' found '+str(aa_end)
                 has_stop = 1
                 if aa_end == -1:
-                    #print 'no more, abort'
                     # no more stop codon, just abort...
                     break
 
-		# we start looking for a M at the earliest at aa_end-aa_len+1,
-		# since we don't want an ORF that's actually bigger than the
-		# original sequence
+                # we start looking for a M at the earliest at aa_end-aa_len+1,
+                # since we don't want an ORF that's actually bigger than the
+                # original sequence
                 if aa_start < aa_end-aa_len+1:
                     aa_start = aa_end-aa_len+1
                 start_codon = trans.find('M', aa_start, aa_end)
-                #print 'found start at '+str(start_codon)
 
                 # is there a start codon? and is it before end of sequence
                 # (remember we doubled up the sequence earlier to detect orfs
                 # crossing boundaries)
                 if start_codon == -1 or start_codon >= aa_len:
-                    #print 'aborting'
                     assert(aa_end != -1)
                     aa_start = aa_end+1
                     continue
 
                 if aa_end-start_codon >= min_protein_len:
-                    #print 'found '+trans[start_codon:aa_end]
-
                     # the following start and end need to start with
                     # 1, not 0.
                     if strand == 1:
@@ -92,7 +81,6 @@ def detect_orfs_and_tags(dna):
                     orf_list.append(f)
 
                     orf_annotated = f
-                    #print str(f.to_dict())
 
                     # also try to see if we can find any protein tags
                     # in this ORF
