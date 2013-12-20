@@ -17,10 +17,7 @@ DATABASES = {
   'default': {
     'ENGINE': 'django.db.backends.sqlite3',
     'NAME': 'sqlite3-db',
-    'USER': '',
-    'PASSWORD': '',
-    'HOST': '',
-    'PORT': '',
+    'ATOMIC_REQUESTS': True
   }
 }
 
@@ -113,7 +110,6 @@ MIDDLEWARE_CLASSES = (
   'django.contrib.messages.middleware.MessageMiddleware',
   # Uncomment the next line for simple clickjacking protection:
   # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
-  'django.middleware.transaction.TransactionMiddleware',
 )
 
 ROOT_URLCONF = 'server.urls'
