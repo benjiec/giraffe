@@ -19,7 +19,7 @@ svg path { cursor:pointer; }
 .giraffe-viewer { height:700px; overflow:auto; }
 /* -seq-viewer should be contained within -viewer */
 .giraffe-seq-viewer { height:600px; overflow:auto; }
-.giraffe-tabs { height:3000px; overflow:auto; }
+/* .giraffe-tabs { height:3000px; overflow:auto; } */
 
 /* Generic */
 .giraffe-clear { clear:both; margin:15px; }
