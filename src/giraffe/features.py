@@ -205,7 +205,10 @@ def blast(sequence, dbobj, protein=False,
   cl = "%s/%s" % (settings.NCBI_BIN_DIR, cl)
   r = subprocess.call(cl.split(" "))
   if r != 0:
-    raise Exception("Blast failed: %s" % (cl,))
+    # blast can fail if blastdb is not there, which can happen if there were no
+    # sequences available to build a db
+    print "Blast failed: %s" % (cl,)
+    return []
 
   with open(outfile, "r") as f:
     blast_record = NCBIXML.read(f)
