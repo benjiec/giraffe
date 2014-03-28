@@ -1333,12 +1333,8 @@ window.GiraffeAnalyze2 = function ($,gd,options) {
         analyzer_tabs(dom_tabs);
         sequence_viewer_bp_event(dom_viewer);
 
-        $(dom_main).width(analyzer_width);
-        var viewer_width = 2*analyzer_width/5;
-        var tabs_width = analyzer_width-viewer_width;
-        $(dom_viewer).width(viewer_width);
-        $(dom_tabs).width(tabs_width);
-    
+        $(dom_viewer).addClass('giraffe-viewer-container')
+        $(dom_tabs).addClass('giraffe-tabs-container')
         $(dom_main).tooltip();
     }
 

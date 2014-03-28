@@ -56,6 +56,9 @@ svg path { cursor:pointer; }
     font-size:12px;
 }
 
+.giraffe-viewer-container { width:35%; }
+.giraffe-tabs-container { width:65%; }
+
 .giraffe-viewer { padding:4px; border:1px solid #ddd; }
 .giraffe-viewer-topbar { margin:0px 0px 20px 0px; padding-right:5px; text-align:left; }
 .giraffe-viewer-topbar div { display:inline-block; margin-left:4px; float: right;}
