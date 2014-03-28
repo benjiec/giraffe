@@ -63,6 +63,7 @@ svg path { cursor:pointer; }
 .giraffe-viewer-topbar { margin:0px 0px 20px 0px; padding-right:5px; text-align:left; }
 .giraffe-viewer-topbar div { display:inline-block; margin-left:4px; float: right;}
 .giraffe-seq-viewer table { font-family:courier; }
+.giraffe-seq-viewer table td { display: table-cell; padding: 1px; }
 
 #giraffe-viewer-search-container {
     float:left;
