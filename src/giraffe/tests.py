@@ -149,7 +149,7 @@ class IntegrationTest(TestCase):
     self.assertItemsEqual(res[1],
       [{"show_feature": 1, "layer": "Detected Features",
         "name": "G1", "type_id": 5, "label": "G1", 
-        "start": 1, "end": 0, "clockwise": True,
+        "start": 1, "end": 23, "clockwise": True,
         "alignment": {  "query": "ATTGCGGATCGCGAATGCGATCG",
                         "match": "|||||||||||||||||||||||",
                       "subject": "ATTGCGGATCGCGAATGCGATCG"}},
