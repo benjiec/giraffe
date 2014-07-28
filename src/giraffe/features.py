@@ -247,7 +247,8 @@ def blast(sequence, dbobj, protein=False,
 
         start = hsp.query_start
         end = hsp.query_end
-        end = end % len(input)
+        if end > len(input):
+          end = end % len(input)
 
         feature = alignment.hit_def
 
