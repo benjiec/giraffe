@@ -410,7 +410,3 @@ def blast2(subject, query):
   os.unlink(subject_file)
   os.unlink(query_file)
   return res
-
-
-
-

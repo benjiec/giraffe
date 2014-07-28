@@ -1,10 +1,11 @@
 Django >= 1.5
 South >= 0.7.2
 
-# BioPython - ORF detection
-numpy
+# ORF detection and reading alignments
 biopython
 
-# Testing
+# testing
 django-nose
 
+# run script
+django-extensions == 1.1.1

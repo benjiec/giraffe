@@ -33,9 +33,15 @@ def _post(request):
     feature_list = gb_features
 
     if not is_gb or ('gbonly' not in request.REQUEST) or request.REQUEST['gbonly'] != '1':
+      args = {}
+      if 'identity_threshold' in request.REQUEST:
+        args['identity_threshold'] = float(request.REQUEST['identity_threshold'])
+      if 'feature_threshold' in request.REQUEST:
+        args['feature_threshold'] = float(request.REQUEST['feature_threshold'])
+
       # feature detection
-      feature_list += features.blast(sequence, db, protein=False)
-      feature_list += features.blast(sequence, db, protein=True)
+      feature_list += features.blast(sequence, db, protein=False, **args)
+      feature_list += features.blast(sequence, db, protein=True, **args)
       # restriction site search
       feature_list += features.find_restriction_sites(sequence)
       # ORFs and tags
@@ -128,4 +134,3 @@ def blast2(request):
   except Exception as e:
     print str(e)
     raise(e)
-

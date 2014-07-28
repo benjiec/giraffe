@@ -137,6 +137,7 @@ INSTALLED_APPS = (
 
     # for testing
     'django_nose',
+    'django_extensions',
 )
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
