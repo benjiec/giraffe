@@ -1,4 +1,5 @@
 from django.http import HttpResponse
+from Bio.Alphabet import IUPAC
 import features
 import orfs
 import json
@@ -28,7 +29,11 @@ def _post(request):
       sequence, gb_features = gb.parse_genbank(sequence.lstrip())
 
     # clean sequence
-    sequence = features.clean_sequence(sequence)
+    input_type = request.REQUEST.get('input', 'dna')
+    if input_type in ['protein']:
+      sequence = features.clean_sequence(sequence, alphabet=IUPAC.protein)
+    else:
+      sequence = features.clean_sequence(sequence)
 
     feature_list = gb_features
 
@@ -43,14 +48,15 @@ def _post(request):
         circular = False
 
       # feature detection
-      feature_list += features.blast(sequence, db, protein=False, circular=circular, **args)
-      feature_list += features.blast(sequence, db, protein=True, circular=circular, **args)
-      # restriction site search
-      feature_list += features.find_restriction_sites(sequence, circular=circular)
-      # ORFs and tags
-      orf_list, tag_list = orfs.detect_orfs_and_tags(sequence, circular=circular)
-      feature_list += orf_list
-      feature_list += tag_list
+      feature_list += features.blast(sequence, db, input_type=input_type, protein=False, circular=circular, **args)
+      feature_list += features.blast(sequence, db, input_type=input_type, protein=True, circular=circular, **args)
+      if input_type == 'dna':
+        # restriction site search
+        feature_list += features.find_restriction_sites(sequence, circular=circular)
+        # ORFs and tags
+        orf_list, tag_list = orfs.detect_orfs_and_tags(sequence, circular=circular)
+        feature_list += orf_list
+        feature_list += tag_list
 
     res = [x.to_dict() for x in feature_list]
     # print 'returning %s' % (res,)

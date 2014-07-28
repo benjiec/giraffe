@@ -162,16 +162,20 @@ class Blast_Accession(object):
     self.feature_length = int(a[2])
 
 
-from Bio.Blast.Applications import NcbiblastnCommandline, NcbiblastxCommandline
+from Bio.Blast.Applications import NcbiblastnCommandline
+from Bio.Blast.Applications import NcbiblastpCommandline
+from Bio.Blast.Applications import NcbiblastxCommandline
+from Bio.Blast.Applications import NcbitblastnCommandline
 from Bio.Blast import NCBIXML
 import tempfile
 import subprocess
 
-def blast(sequence, dbobj, protein=False,
+def blast(sequence, dbobj, input_type='dna', protein=False,
           identity_threshold=0.85, evalue_threshold=0.001, feature_threshold=None, circular=True):
   """
-  Blast sequence against specified feature database, using blastn if
-  protein=False (default), or blastx if protein=True.
+  Blast sequence against specified feature database. If input type is 'dna',
+  using blastn if protein=False (default), or blastx if protein=True. If input
+  type is 'protein', using tblastn if protein=False, or blastp if protein=True.
 
   identity_threshold: only return results with identity rate greater than this
   threshold. Can be None. Default is 0.85.
@@ -198,11 +202,20 @@ def blast(sequence, dbobj, protein=False,
 
   outfile = "%s.out.xml" % (infile,)
   if protein:
-    blast_cl = NcbiblastxCommandline(query=infile, db="%s" % (dbobj.protein_db_name(),),
-                                     evalue=evalue_threshold, word_size=3, outfmt=5, out=outfile)
+    if input_type == 'dna':
+      blast_cl = NcbiblastxCommandline(query=infile, db="%s" % (dbobj.protein_db_name(),),
+                                       evalue=evalue_threshold, word_size=3, outfmt=5, out=outfile)
+    else:
+      blast_cl = NcbiblastpCommandline(query=infile, db="%s" % (dbobj.protein_db_name(),),
+                                       evalue=evalue_threshold, word_size=3, outfmt=5, out=outfile)
   else:
-    blast_cl = NcbiblastnCommandline(query=infile, db="%s" % (dbobj.dna_db_name(),),
-                                     evalue=evalue_threshold, word_size=6, outfmt=5, out=outfile)
+    if input_type == 'dna':
+      blast_cl = NcbiblastnCommandline(query=infile, db="%s" % (dbobj.dna_db_name(),),
+                                       evalue=evalue_threshold, word_size=6, outfmt=5, out=outfile)
+    else:
+      blast_cl = NcbitblastnCommandline(query=infile, db="%s" % (dbobj.dna_db_name(),),
+                                        evalue=evalue_threshold, word_size=6, outfmt=5, out=outfile)
+
 
   cl = str(blast_cl)
   cl = "%s/%s" % (settings.NCBI_BIN_DIR, cl)
