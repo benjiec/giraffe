@@ -38,14 +38,17 @@ def _post(request):
         args['identity_threshold'] = float(request.REQUEST['identity_threshold'])
       if 'feature_threshold' in request.REQUEST:
         args['feature_threshold'] = float(request.REQUEST['feature_threshold'])
+      circular = True
+      if 'circular' in request.REQUEST and request.REQUEST['circular'].strip().lower() in ['false', 0, '0']:
+        circular = False
 
       # feature detection
-      feature_list += features.blast(sequence, db, protein=False, **args)
-      feature_list += features.blast(sequence, db, protein=True, **args)
+      feature_list += features.blast(sequence, db, protein=False, circular=circular, **args)
+      feature_list += features.blast(sequence, db, protein=True, circular=circular, **args)
       # restriction site search
-      feature_list += features.find_restriction_sites(sequence)
+      feature_list += features.find_restriction_sites(sequence, circular=circular)
       # ORFs and tags
-      orf_list, tag_list = orfs.detect_orfs_and_tags(sequence)
+      orf_list, tag_list = orfs.detect_orfs_and_tags(sequence, circular=circular)
       feature_list += orf_list
       feature_list += tag_list
 

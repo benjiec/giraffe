@@ -168,7 +168,7 @@ import tempfile
 import subprocess
 
 def blast(sequence, dbobj, protein=False,
-          identity_threshold=0.85, evalue_threshold=0.001, feature_threshold=None):
+          identity_threshold=0.85, evalue_threshold=0.001, feature_threshold=None, circular=True):
   """
   Blast sequence against specified feature database, using blastn if
   protein=False (default), or blastx if protein=True.
@@ -187,7 +187,10 @@ def blast(sequence, dbobj, protein=False,
   infile = None
   feature_list = []
   input = clean_sequence(sequence)
-  input2 = input+input
+  if circular is True:
+    input2 = input+input
+  else:
+    input2 = input
 
   with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
     infile = f.name 
@@ -314,9 +317,12 @@ _MyEnzymes = [AatII, AflII, AgeI, ApaI, ApaLI, AscI, AseI,
 MyEnzymes = RestrictionBatch([x for x in _MyEnzymes if x.elucidate().find('^') >= 0])
 
 
-def find_restriction_sites(sequence):
+def find_restriction_sites(sequence, circular=True):
   input_seq = clean_sequence(sequence)
-  input2 = Seq(input_seq+input_seq)
+  if circular is True:
+    input2 = Seq(input_seq+input_seq)
+  else:
+    input2 = Seq(input_seq)
   r = MyEnzymes.search(input2)
   cutter_list = []
   for enzyme in r:

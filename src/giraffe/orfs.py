@@ -21,12 +21,15 @@ class Orf(Detected_Feature_Base):
     return r 
 
 
-def detect_orfs_and_tags(dna):
+def detect_orfs_and_tags(dna, circular=True):
     orf_list = []
     tag_list = []
 
     # double up sequence, so we can detect features across 0 bp boundary
-    seq = Seq(dna*2)
+    if circular is True:
+      seq = Seq(dna*2)
+    else:
+      seq = Seq(dna)
     seq_len = len(dna)
     aa_len = int(math.floor(seq_len/3.0))
 
