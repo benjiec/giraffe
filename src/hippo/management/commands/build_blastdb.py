@@ -7,6 +7,6 @@ class Command(BaseCommand):
   def handle(self, *args, **options):
 
     for feature_db in Feature_Database.objects.all():
-      print 'building %s using %s' % (feature_db.name, settings.NCBI_BIN_DIR)
+      #print 'building %s using %s' % (feature_db.name, settings.NCBI_BIN_DIR)
       feature_db.build()
 
