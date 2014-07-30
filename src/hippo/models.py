@@ -93,6 +93,7 @@ class Feature_Database(models.Model):
 
     is_dna = False
     infile = None
+    nadded = 0
 
     with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
       infile = f.name
@@ -110,16 +111,18 @@ class Feature_Database(models.Model):
                   self.name,
                   Blast_Accession.make(type=feature.type.type, feature_id=feature.id, feature_length=len(data)),
                   feature.name, data))
+          nadded += 1
 
-    outfn = self.dna_db_name() if is_dna else self.protein_db_name()
-    dbtype = self.dna_db_type() if is_dna else self.protein_db_type()
+    if nadded > 0:
+      outfn = self.dna_db_name() if is_dna else self.protein_db_name()
+      dbtype = self.dna_db_type() if is_dna else self.protein_db_type()
 
-    cmd = "%s/makeblastdb -in %s -out %s -title %s -dbtype %s -parse_seqids -input_type fasta" % (
-          settings.NCBI_BIN_DIR, infile, outfn, self.name, dbtype)
+      cmd = "%s/makeblastdb -in %s -out %s -title %s -dbtype %s -parse_seqids -input_type fasta" % (
+            settings.NCBI_BIN_DIR, infile, outfn, self.name, dbtype)
 
-    r = subprocess.call(cmd.split(' '))
-    if r != 0:
-      print 'Cannot makeblastdb for %s' % (self.name,)
+      r = subprocess.call(cmd.split(' '))
+      if r != 0:
+        print 'Cannot makeblastdb for %s' % (self.name,)
 
     os.unlink(infile)
 
