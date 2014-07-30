@@ -120,9 +120,9 @@ class Feature_Database(models.Model):
       cmd = "%s/makeblastdb -in %s -out %s -title %s -dbtype %s -parse_seqids -input_type fasta" % (
             settings.NCBI_BIN_DIR, infile, outfn, self.name, dbtype)
 
-      r = subprocess.call(cmd.split(' '))
-      if r != 0:
-        print 'Cannot makeblastdb for %s' % (self.name,)
+      r = subprocess.check_output(cmd.split(' '))
+      if 'Adding sequences from FASTA' not in r:
+        print r
 
     os.unlink(infile)
 
