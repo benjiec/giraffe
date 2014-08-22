@@ -125,8 +125,12 @@ class Detected_Feature_Base(object):
 class Aligned_Feature(Detected_Feature_Base):
 
   def __init__(self, name, label, start, end, clockwise, type,
-               query, match, subject, feature_id, evalue, identities):
+               subject_start, subject_end,
+               query, match, subject,
+               feature_id, evalue, identities):
     super(Aligned_Feature, self).__init__(name, label, start, end, clockwise, type)
+    self.subject_start = subject_start
+    self.subject_end = subject_end
     self.query = query
     self.match = match
     self.subject = subject
@@ -136,6 +140,8 @@ class Aligned_Feature(Detected_Feature_Base):
 
   def to_dict(self):
     r = super(Aligned_Feature, self).to_dict()
+    r['subject_start'] = self.subject_start
+    r['subject_end'] = self.subject_end
     r['alignment'] = { 'query': self.query, 'match': self.match, 'subject': self.subject }
     r['evalue'] = self.evalue
     r['identities'] = self.identities
@@ -274,6 +280,7 @@ def blast(sequence, dbobj, input_type='dna', protein=False,
           feature = '%s (%s-%s/%s)' % (feature, hit_start, hit_end, accession.feature_length)
 
         f = Aligned_Feature(feature, alignment.hit_def, start, end, clockwise, accession.type,
+                            hsp.sbjct_start, hsp.sbjct_end,
                             hsp.query, hsp.match, hsp.sbjct, accession.feature_id,
                             hsp.expect, hsp.identities)
         feature_list.append(f)
