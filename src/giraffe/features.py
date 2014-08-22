@@ -136,8 +136,9 @@ class Aligned_Feature(Detected_Feature_Base):
 
   def to_dict(self):
     r = super(Aligned_Feature, self).to_dict()
-    r['alignment'] = { 'query': self.query, 'match': self.match, 'subject': self.subject,
-                       'evalue': self.evalue, 'identities': self.identities }
+    r['alignment'] = { 'query': self.query, 'match': self.match, 'subject': self.subject }
+    r['evalue'] = self.evalue
+    r['identities'] = self.identities
     return r
 
   @property
