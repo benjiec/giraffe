@@ -89,6 +89,17 @@ Each feature in the feature array has, among other attributes
 
 The accession value is the Feature.name attribute from the Hippo database.
 
+By default, feature detection returns detected features (from blast), and for
+DNA sequences, detected restriction sites and detected ORFs. If you set
+blastonly=1 in the URL, it will not detect restriction sites or ORFs.  You can
+also set input=protein and send in a protein sequence as query.
+
+You can use Hippo to build DNA or protein blast databases. Giraffe uses blastn
+to blast DNA queries against DNA blast databases, blastx to blast DNA queries
+against protein blast databases, blastp to blast protein queries against
+protein blast databases, tblastn to blast protein queries against DNA blast
+databases.
+
 Programmatically, you can construct new blast databases using Hippo. E.g.
 
 ```

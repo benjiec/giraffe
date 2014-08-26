@@ -36,8 +36,10 @@ def _post(request):
       sequence = features.clean_sequence(sequence)
 
     feature_list = gb_features
+    gbonly = 'gbonly' in request.REQUEST and request.REQUEST['gbonly'] in ['1', 'true', 'True']
+    blastonly = 'blastonly' in request.REQUEST and request.REQUEST['blastonly'] in ['1', 'true', 'True']
 
-    if not is_gb or ('gbonly' not in request.REQUEST) or request.REQUEST['gbonly'] != '1':
+    if not is_gb or gbonly is False:
       args = {}
       if 'identity_threshold' in request.REQUEST:
         args['identity_threshold'] = float(request.REQUEST['identity_threshold'])
@@ -50,7 +52,8 @@ def _post(request):
       # feature detection
       feature_list += features.blast(sequence, db, input_type=input_type, protein=False, circular=circular, **args)
       feature_list += features.blast(sequence, db, input_type=input_type, protein=True, circular=circular, **args)
-      if input_type == 'dna':
+
+      if input_type == 'dna' and blastonly is False:
         # restriction site search
         feature_list += features.find_restriction_sites(sequence, circular=circular)
         # ORFs and tags
