@@ -214,17 +214,21 @@ def blast(sequence, dbobj, input_type='dna', protein=False,
   if protein:
     if input_type == 'dna':
       blast_cl = NcbiblastxCommandline(query=infile, db="%s" % (dbobj.protein_db_name(),),
-                                       evalue=evalue_threshold, word_size=3, outfmt=5, out=outfile)
+                                       evalue=evalue_threshold, word_size=3, outfmt=5, out=outfile,
+                                       max_target_seqs=10000)
     else:
       blast_cl = NcbiblastpCommandline(query=infile, db="%s" % (dbobj.protein_db_name(),),
-                                       evalue=evalue_threshold, word_size=3, outfmt=5, out=outfile)
+                                       evalue=evalue_threshold, word_size=3, outfmt=5, out=outfile,
+                                       max_target_seqs=10000)
   else:
     if input_type == 'dna':
       blast_cl = NcbiblastnCommandline(query=infile, db="%s" % (dbobj.dna_db_name(),),
-                                       evalue=evalue_threshold, word_size=6, outfmt=5, out=outfile)
+                                       evalue=evalue_threshold, word_size=6, outfmt=5, out=outfile,
+                                       max_target_seqs=10000)
     else:
       blast_cl = NcbitblastnCommandline(query=infile, db="%s" % (dbobj.dna_db_name(),),
-                                        evalue=evalue_threshold, word_size=6, outfmt=5, out=outfile)
+                                        evalue=evalue_threshold, word_size=6, outfmt=5, out=outfile,
+                                        max_target_seqs=10000)
 
 
   cl = str(blast_cl)
