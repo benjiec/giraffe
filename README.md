@@ -2,12 +2,12 @@
 
 This repository consists of two tools: Giraffe and Hippo. Giraffe includes a
 set of javascripts that visualize sequences and sequence features, and a Django
-app that detects features, restriction sites, and ORFs from a sequence. You can
-use the javascripts independently from the Django program. Hippo is a Django
-frontend for managing NCBI blast databases. User can create sequences, assign
-them to databases, and use Django management commands to build NCBI blast
-databases. Giraffe uses NCBI blast databases, for example, to detect features
-in a sequence.
+app that blast query against DNA or protein sequences, detects features,
+restriction sites, and ORFs from a sequence. You can use the javascripts
+independently from the Django program. Hippo is a Django frontend for managing
+NCBI blast databases. User can create sequences, assign them to databases, and
+use Django management commands to build NCBI blast databases. Giraffe uses NCBI
+blast to detect features in the query sequence.
 
 Hippo and Giraffe provide a convenient way to use Blast for your own
 application. You can build blast databases using Hippo, then use Giraffe to
@@ -28,7 +28,7 @@ visualize a sequence you already have a list of features for.
 See src/giraffe/templates/giraffe/{analyze,draw}.html.
 
 
-### Giraffe - Sequence feature detection
+### Giraffe - Sequence feature detection and blast
 
 Requirements:
 
@@ -67,7 +67,27 @@ You can POST a sequence to "/giraffe/analyze/", with the following params:
 db=default&sequence=your_dna_sequence_or_genbank_sequence_here
 ```
 
+There are some other params you can set, e.g. identity_threshold,
+feature_threshold, circular. See giraffe/views.py and giraffe/features.py.
+
 This will return a JSON array of [sequence_len, array of features, sequence].
+Each feature in the feature array has, among other attributes
+
+```
+{ "query_start": ...,
+  "query_end": ...,
+  "subject_start": ...,
+  "subect_end": ...,
+  "accession": ...,
+  "alignment": {
+    "query": ...,
+    "match": ...,
+    "subject": ...
+  }
+}
+```
+
+The accession value is the Feature.name attribute from the Hippo database.
 
 Programmatically, you can construct new blast databases using Hippo. E.g.
 
@@ -100,5 +120,3 @@ Use Django admin to add features, group features into databases. Use the
 build_blastdb django management command to build your databases, then Giraffe
 can use the databases for feature detection. Alternatively, call the
 ```build``` method on a ```Feature_Database object``` directly.
-
-

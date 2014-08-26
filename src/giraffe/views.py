@@ -62,7 +62,7 @@ def _post(request):
     # print 'returning %s' % (res,)
 
     # now sort everything by start
-    res.sort(cmp=lambda x,y:cmp(int(x['start']),int(y['start'])))
+    res.sort(cmp=lambda x,y:cmp(int(x['query_start']),int(y['query_start'])))
 
     res = [len(sequence),res,sequence]
     j = json.JSONEncoder().encode(res)

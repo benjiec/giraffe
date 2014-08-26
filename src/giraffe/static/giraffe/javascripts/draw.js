@@ -239,12 +239,12 @@ window.GiraffeDraw2 = function () {
         if (feat.name) { _name = feat.name; }
         else if (feat.feature) { _name = feat.feature }
         var _label;
-        if (feat.label) { _label = feat.label; }
+        if (feat.label) { _label = feat.accession; }
         else { _label = _name; }
         var _link;
         if (feat.link) { _link = feat.link; }
-        var _start = parseInt(feat.start, 10);
-        var _end = parseInt(feat.end, 10);
+        var _start = parseInt(feat.query_start, 10);
+        var _end = parseInt(feat.query_end, 10);
         var _type = parseInt(feat.type_id, 10);
         var _layer = 'Default';
         if (feat.layer) { _layer = feat.layer; }

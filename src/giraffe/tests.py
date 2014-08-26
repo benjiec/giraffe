@@ -147,14 +147,13 @@ class IntegrationTest(TestCase):
 
     self.assertEquals(res[0], len(self.dna))
     self.assertItemsEqual(res[1],
-      [{"show_feature": 1,
-        "layer": "Detected Features",
+      [{"layer": "Detected Features",
         "name": "G1",
         "type_id": 5,
-        "label": "G1", 
+        "accession": "G1", 
         "clockwise": True,
-        "start": 1,
-        "end": 23,
+        "query_start": 1,
+        "query_end": 23,
         "subject_start": 1,
         "subject_end": 23,
         "evalue": 6.01355e-11,
@@ -163,13 +162,13 @@ class IntegrationTest(TestCase):
                         "match": "|||||||||||||||||||||||",
                       "subject": "ATTGCGGATCGCGAATGCGATCG"}},
 
-       {"show_feature": 1, "layer": "Restriction Enzymes",
-        "name": "NruI", "type_id": 4, "elucidate": "TCG^_CGA", "label": "NruI", 
-        "start": 9, "cut": 11, "end": 14, "clockwise": True},
+       {"layer": "Restriction Enzymes",
+        "name": "NruI", "type_id": 4, "elucidate": "TCG^_CGA", "accession": "NruI", 
+        "query_start": 9, "cut": 11, "query_end": 14, "clockwise": True},
 
-       {"show_feature": 1, "layer": "Restriction Enzymes",
-        "name": "ClaI", "type_id": 4, "elucidate": "AT^CG_AT", "label": "ClaI",
-        "start": 20, "cut": 21, "end": 2, "clockwise": True}
+       {"layer": "Restriction Enzymes",
+        "name": "ClaI", "type_id": 4, "elucidate": "AT^CG_AT", "accession": "ClaI",
+        "query_start": 20, "cut": 21, "query_end": 2, "clockwise": True}
       ]
     )
 
@@ -186,16 +185,15 @@ class IntegrationTest(TestCase):
 
     self.assertEquals(res[0], len(q))
     self.assertItemsEqual(res[1], [
-      {"show_feature": 1,
-       "layer": "Detected Features",
-       "start": 2,
-       "end": 25,
+      {"layer": "Detected Features",
+       "query_start": 2,
+       "query_end": 25,
        "subject_start" : 1,
        "subject_end" : 8,
        "clockwise": True,
        "name": "G2",
        "type_id": 5,
-       "label": "G2",
+       "accession": "G2",
        "alignment": {"query": "MKKKAPSI", "match": "MKKKAPSI", "subject": "MKKKAPSI"},
        "evalue": 5.42133e-5,
        "identities": 8
@@ -219,4 +217,3 @@ class IntegrationTest(TestCase):
           "match": "||||||||||||||||||||||",
         "subject": "ATTGCGGATCGCGAATGCGATC" },
     ])
- 

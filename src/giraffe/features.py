@@ -112,14 +112,13 @@ class Detected_Feature_Base(object):
 
   def to_dict(self):
     t = Feature_Type_Choices.by_label(self.type)
-    return dict(start=self.start,
-                end=self.end,
+    return dict(query_start=self.start,
+                query_end=self.end,
+                accession=self.label,
+                name=self.name,
                 clockwise=self.clockwise,
                 layer=self.layer,
-                label=self.label,
-                name=self.name,
-                type_id=t[0],
-                show_feature=1)
+                type_id=t[0])
 
 
 class Aligned_Feature(Detected_Feature_Base):
