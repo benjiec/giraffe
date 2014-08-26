@@ -147,9 +147,18 @@ class IntegrationTest(TestCase):
 
     self.assertEquals(res[0], len(self.dna))
     self.assertItemsEqual(res[1],
-      [{"show_feature": 1, "layer": "Detected Features",
-        "name": "G1", "type_id": 5, "label": "G1", 
-        "start": 1, "end": 23, "clockwise": True,
+      [{"show_feature": 1,
+        "layer": "Detected Features",
+        "name": "G1",
+        "type_id": 5,
+        "label": "G1", 
+        "clockwise": True,
+        "start": 1,
+        "end": 23,
+        "subject_start": 1,
+        "subject_end": 23,
+        "evalue": 6.01355e-11,
+        "identities": 23,
         "alignment": {  "query": "ATTGCGGATCGCGAATGCGATCG",
                         "match": "|||||||||||||||||||||||",
                       "subject": "ATTGCGGATCGCGAATGCGATCG"}},
@@ -177,10 +186,20 @@ class IntegrationTest(TestCase):
 
     self.assertEquals(res[0], len(q))
     self.assertItemsEqual(res[1], [
-      {"show_feature": 1, "layer": "Detected Features",
-       "start": 2, "end": 25, "clockwise": True,
-       "name": "G2", "type_id": 5, "label": "G2",
-       "alignment": {"query": "MKKKAPSI", "match": "MKKKAPSI", "subject": "MKKKAPSI"}},
+      {"show_feature": 1,
+       "layer": "Detected Features",
+       "start": 2,
+       "end": 25,
+       "subject_start" : 1,
+       "subject_end" : 8,
+       "clockwise": True,
+       "name": "G2",
+       "type_id": 5,
+       "label": "G2",
+       "alignment": {"query": "MKKKAPSI", "match": "MKKKAPSI", "subject": "MKKKAPSI"},
+       "evalue": 5.42133e-5,
+       "identities": 8
+      }
     ])
 
 
