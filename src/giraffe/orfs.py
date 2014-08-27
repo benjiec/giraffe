@@ -1,5 +1,5 @@
 from Bio.Seq import Seq
-from features import Detected_Feature_Base, Feature_Type_Choices
+from giraffe_features import Giraffe_Feature_Base, Feature_Type_Choices
 import math
 import tags
 
@@ -7,12 +7,16 @@ trans_table = 1 # standard translation table
 min_protein_len = 150
 
 
-class Orf(Detected_Feature_Base):
+class Orf(Giraffe_Feature_Base):
 
-  def __init__(self, name, start, end, clockwise, orf_frame=None):
-    super(Orf, self).__init__(name, name, start, end, clockwise, Feature_Type_Choices.ORF[1])
+  def __init__(self, name, start, end, size, strand, orf_frame=None):
+    sbj_start = 1
+    sbj_end = size
+    if strand != 1:
+      sbj_start = size
+      sbj_end = 1
+    super(Orf, self).__init__(name, name, start, end, sbj_start, sbj_end, Feature_Type_Choices.ORF[1], 'ORFs')
     self.orf_frame = orf_frame
-    self.layer = 'ORFs'
 
   def to_dict(self):
     r = super(Orf, self).to_dict()
@@ -70,17 +74,18 @@ def detect_orfs_and_tags(dna, circular=True):
                     if strand == 1:
                         start = frame+start_codon*3+1
                         end = frame+aa_end*3+has_stop*3
+                        size = end-start+1
                         if end > seq_len:
                             end = end % seq_len
                     else:
                         start = seq_len-frame-aa_end*3-has_stop*3+1
                         end = seq_len-frame-start_codon*3
+                        size = end-start+1
                         if start < 0:
                             start = seq_len+start
 
-                    f = Orf(name='ORF frame '+str(frame+1),
-                            start=start, end=end, clockwise = True if strand == 1 else False,
-                            orf_frame=frame)
+                    f = Orf(name='ORF frame '+str(frame+1), start=start, end=end,
+                            size=size, strand=strand, orf_frame=frame)
                     orf_list.append(f)
 
                     orf_annotated = f
@@ -106,13 +111,18 @@ def detect_orfs_and_tags(dna, circular=True):
                                 if tag_start < 0:
                                     tag_start = seq_len+tag_start
 
-                            f = Detected_Feature_Base(name=tag, label=tag, start=tag_start, end=tag_end,
-                                                      clockwise = True if strand == 1 else False,
-                                                      type = Feature_Type_Choices.FEATURE[1])
+                            sbj_start = 1
+                            sbj_end = tag_end-tag_start+1
+                            if strand != 1:
+                              sbj_start = tag_end-tag_start+1
+                              sbj_end = 1
+                            f = Giraffe_Feature_Base(label=tag, name=tag,
+                                                     query_start=tag_start, query_end=tag_end,
+                                                     subject_start=sbj_start, subject_end=sbj_end,
+                                                     type=Feature_Type_Choices.FEATURE[1],
+                                                     layer='Detected Features')
                             tag_list.append(f)
-
 
                 aa_start = aa_end+1
 
     return (orf_list, tag_list)
-

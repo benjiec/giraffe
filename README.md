@@ -1,39 +1,25 @@
-### Sequence Feature Detection and Mapping
+### Blast and Sequence Feature Detection
 
-This repository consists of two tools: Giraffe and Hippo. Giraffe includes a
-set of javascripts that visualize sequences and sequence features, and a Django
-app that blast query against DNA or protein sequences, detects features,
-restriction sites, and ORFs from a sequence. You can use the javascripts
-independently from the Django program. Hippo is a Django frontend for managing
-NCBI blast databases. User can create sequences, assign them to databases, and
-use Django management commands to build NCBI blast databases. Giraffe uses NCBI
-blast to detect features in the query sequence.
+Giraffe consists of two tools: Giraffe feature detection, and Hippo feature
+database manager.
 
-Hippo and Giraffe provide a convenient way to use Blast for your own
-application. You can build blast databases using Hippo, then use Giraffe to
-blast query sequence against the database. Hippo offers a Django admin UI to
-manage the blast DB, while Giraffe handles calling blast, parsing blast
-results, and visualizing detected features.
+User can define features using Hippo, assign features to databases, build NCBI
+blast databases, and use Giraffe API to detect features in a given query
+sequence.
 
 This software was originally written by Misha Wolfson and Benjie Chen,
 copyrighted by Addgene, and released under the MIT License. See LICENSE file.
-It is now maintained by Benjie Chen.
+It is now maintained by Benjie Chen. Originally, Giraffe included a Javascript
+application for visualizing features on a sequence. That tool has now been
+moved to [giraffe-ui](http://github.com/benjiec/giraffe-ui).
 
 
-### Giraffe - Visualization
-
-You can use Giraffe javascripts independently of the Django service, to
-visualize a sequence you already have a list of features for.
-
-See src/giraffe/templates/giraffe/{analyze,draw}.html.
-
-
-### Giraffe - Sequence feature detection and blast
+### Try it out
 
 Requirements:
 
-  * System requirements: see provison/provision.sh (you can use this to
-    provision a Vagrant instance, e.g.)
+  * System requirements: see provison/provision.sh (e.g. you can use this to
+    provision a Vagrant instance).
 
   * Python requirements: pip install -r requirements.txt
     (Currently supports Django 1.5 or higher)
@@ -56,7 +42,9 @@ Run test server:
 cd src; python manage.py runserver 0.0.0.0:8000
 ```
 
-Then goto http://0.0.0.0:8000/giraffe/demo/
+To test it out, install [giraffe-ui](http://github.com/benjiec/giraffe-ui) and
+point the example ```analyze.html``` and ```draw.html``` files to
+```http://0.0.0.0:8000/giraffe/analyze/```.
 
 
 ### API
@@ -74,11 +62,21 @@ This will return a JSON array of [sequence_len, array of features, sequence].
 Each feature in the feature array has, among other attributes
 
 ```
-{ "query_start": ...,
+{
+  "query_start": ...,
   "query_end": ...,
   "subject_start": ...,
   "subect_end": ...,
-  "accession": ...,
+  "label": ...,
+  ...
+}
+```
+
+Features from blast also has the following attributes
+
+```
+{
+  ...
   "alignment": {
     "query": ...,
     "match": ...,
@@ -87,12 +85,13 @@ Each feature in the feature array has, among other attributes
 }
 ```
 
-The accession value is the Feature.name attribute from the Hippo database.
+The format of the JSON is "standardized" in
+[giraffe-features](http://github.com/benjiec/giraffe-features).
 
-By default, feature detection returns detected features (from blast), and for
-DNA sequences, detected restriction sites and detected ORFs. If you set
-blastonly=1 in the URL, it will not detect restriction sites or ORFs.  You can
-also set input=protein and send in a protein sequence as query.
+By default, feature detection returns features (from blast), and for DNA
+sequences, restriction sites and ORFs. If you set blastonly=1 in the URL, it
+will not detect restriction sites or ORFs.  You can also set input=protein and
+send in a protein sequence as query.
 
 You can use Hippo to build DNA or protein blast databases. Giraffe uses blastn
 to blast DNA queries against DNA blast databases, blastx to blast DNA queries

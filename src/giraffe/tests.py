@@ -36,9 +36,10 @@ class BlastTest(TestCase):
 
     self.assertEquals(len(feature_list), 1)
     self.assertEquals(feature_list[0].name, self.feature1.name)
-    self.assertEquals(feature_list[0].start, 101)
-    self.assertEquals(feature_list[0].end, 100+len(self.dna))
-    self.assertEquals(feature_list[0].clockwise, True)
+    self.assertEquals(feature_list[0].query_start, 101)
+    self.assertEquals(feature_list[0].query_end, 100+len(self.dna))
+    self.assertEquals(feature_list[0].subject_start, 1)
+    self.assertEquals(feature_list[0].subject_end, len(self.dna))
 
   def test_blast_evalue_threshold(self):
     self.feature_db.build()
@@ -60,9 +61,10 @@ class BlastTest(TestCase):
 
     feature_list = blast(query, self.feature_db, identity_threshold=None)
     self.assertEquals(len(feature_list), 1)
-    self.assertEquals(feature_list[0].start, 101)
-    self.assertEquals(feature_list[0].end, 100+len(self.dna))
-    self.assertEquals(feature_list[0].clockwise, True)
+    self.assertEquals(feature_list[0].query_start, 101)
+    self.assertEquals(feature_list[0].query_end, 100+len(self.dna))
+    self.assertEquals(feature_list[0].subject_start, 1)
+    self.assertEquals(feature_list[0].subject_end, len(self.dna))
 
     feature_list = blast(query, self.feature_db, identity_threshold=0.99)
     self.assertEquals(len(feature_list), 0)
@@ -73,9 +75,10 @@ class BlastTest(TestCase):
     query = 'G'*100+self.dna[0:12]+'A'*40
     feature_list = blast(query, self.feature_db, feature_threshold=None)
     self.assertEquals(len(feature_list), 1)
-    self.assertEquals(feature_list[0].start, 101)
-    self.assertEquals(feature_list[0].end, 100+12)
-    self.assertEquals(feature_list[0].clockwise, True)
+    self.assertEquals(feature_list[0].query_start, 101)
+    self.assertEquals(feature_list[0].query_end, 100+12)
+    self.assertEquals(feature_list[0].subject_start, 1)
+    self.assertEquals(feature_list[0].subject_end, 12)
 
     feature_list = blast(query, self.feature_db, feature_threshold=0.8)
     self.assertEquals(len(feature_list), 0)
@@ -86,7 +89,7 @@ class BlastTest(TestCase):
     query = 'G'*100+self.dna+'A'*40
     feature_list = blast(query, self.feature_db)
     self.assertEquals(len(feature_list), 1)
-    self.assertEquals(feature_list[0].feature.id, self.feature1.id)
+    self.assertEquals(feature_list[0].feature_id, self.feature1.id)
 
   def test_returns_one_result_from_across_circular_boundary(self):
     self.feature_db.build()
@@ -104,9 +107,10 @@ class BlastTest(TestCase):
     query = q[110:]+q[0:110]
 
     feature_list = blast(query, self.feature_db)
-    self.assertEquals(feature_list[0].start, len(q)-10+1)
-    self.assertEquals(feature_list[0].end, len(self.dna)-10)
-    self.assertEquals(feature_list[0].clockwise, True)
+    self.assertEquals(feature_list[0].query_start, len(q)-10+1)
+    self.assertEquals(feature_list[0].query_end, len(self.dna)-10)
+    self.assertEquals(feature_list[0].subject_start, 1)
+    self.assertEquals(feature_list[0].subject_end, len(self.dna))
 
 
 class IntegrationTest(TestCase):
@@ -136,6 +140,124 @@ class IntegrationTest(TestCase):
     self.feature_db.build()
 
 
+  def test_finds_orf_in_both_directions_and_across_boundary(self):
+    self.feature_db.build()
+
+    query = 'G'*100+'ATG'+'C'*3000+'TAG'+'CTA'+'G'*1800+'CAT'
+
+    data = {'db': self.feature_db.name, 'sequence': query}
+    url = reverse('giraffe-analyze')
+    resp = self.client.post(url, data)
+    self.assertEquals(resp.status_code, 200)
+    res = json.loads(resp.content)
+
+    self.assertEquals(res[0], len(query))
+    self.assertItemsEqual(res[1],
+      [
+       {'orf_frame': 1,
+        'layer': 'ORFs',
+        'type_id': 10,
+        'subject_start': 1,
+        'subject_end': 3+3000+3,
+        'query_start': 100+1,
+        'query_end': 100+3+3000+3,
+        'label': 'ORF frame 2',
+        'name': 'ORF frame 2'},
+       {'orf_frame': 0,
+        'layer': 'ORFs',
+        'type_id': 10,
+        'subject_start': 3+1800+3,
+        'subject_end': 1,
+        'query_start': 100+3+3000+3+1,
+        'query_end': 100+3+3000+3+3+1800+3,
+        'label': 'ORF frame 1',
+        'name': 'ORF frame 1'},
+       # across circular boundary, there is AT, then G, it ends with the first
+       # stop codon after C*3000
+       {'orf_frame': 2,
+        'layer': 'ORFs',
+        'type_id': 10,
+        'subject_start': 1,
+        'subject_end': 3+99+3+3000+3,
+        'query_start': len(query)-2+1,
+        'query_end': 100+3+3000+3,
+        'label': 'ORF frame 3',
+        'name': 'ORF frame 3'}
+      ]
+  )
+
+
+  def test_does_not_find_orf_across_boundary_if_not_in_circular_mode(self):
+    self.feature_db.build()
+
+    query = 'G'*100+'ATG'+'C'*3000+'TAG'+'CTA'+'G'*1800+'CAT'
+
+    data = {'db': self.feature_db.name, 'sequence': query, 'circular': 0}
+    url = reverse('giraffe-analyze')
+    resp = self.client.post(url, data)
+    self.assertEquals(resp.status_code, 200)
+    res = json.loads(resp.content)
+
+    self.assertEquals(res[0], len(query))
+    self.assertItemsEqual(res[1],
+      [
+       {'orf_frame': 1,
+        'layer': 'ORFs',
+        'type_id': 10,
+        'subject_start': 1,
+        'subject_end': 3+3000+3,
+        'query_start': 100+1,
+        'query_end': 100+3+3000+3,
+        'label': 'ORF frame 2',
+        'name': 'ORF frame 2'},
+       {'orf_frame': 0,
+        'layer': 'ORFs',
+        'type_id': 10,
+        'subject_start': 3+1800+3,
+        'subject_end': 1,
+        'query_start': 100+3+3000+3+1,
+        'query_end': 100+3+3000+3+3+1800+3,
+        'label': 'ORF frame 1',
+        'name': 'ORF frame 1'}
+      ]
+  )
+
+
+  def test_find_tags_within_orf(self):
+    self.feature_db.build()
+
+    query = 'G'*100+'ATG'+'C'*3000+'CAT'*6+'TAG'
+
+    data = {'db': self.feature_db.name, 'sequence': query, 'circular': 0}
+    url = reverse('giraffe-analyze')
+    resp = self.client.post(url, data)
+    self.assertEquals(resp.status_code, 200)
+    res = json.loads(resp.content)
+
+    self.assertEquals(res[0], len(query))
+    self.assertItemsEqual(res[1],
+      [
+       {'orf_frame': 1,
+        'layer': 'ORFs',
+        'type_id': 10,
+        'subject_start': 1,
+        'subject_end': 3+3000+3*6+3,
+        'query_start': 100+1,
+        'query_end': 100+3+3000+3*6+3,
+        'label': 'ORF frame 2',
+        'name': 'ORF frame 2'},
+       {'layer': 'Detected Features',
+        'type_id': 1,
+        'subject_start': 1,
+        'subject_end': 3*6,
+        'query_start': 100+3+3000+1,
+        'query_end': 100+3+3000+3*6,
+        'label': '6xHIS',
+        'name': '6xHIS'}
+      ]
+  )
+
+
   def test_blastn(self):
     self.feature_db.build()
 
@@ -150,8 +272,7 @@ class IntegrationTest(TestCase):
       [{"layer": "Detected Features",
         "name": "G1",
         "type_id": 5,
-        "accession": "G1", 
-        "clockwise": True,
+        "label": "G1", 
         "query_start": 1,
         "query_end": 23,
         "subject_start": 1,
@@ -163,12 +284,12 @@ class IntegrationTest(TestCase):
                       "subject": "ATTGCGGATCGCGAATGCGATCG"}},
 
        {"layer": "Restriction Enzymes",
-        "name": "NruI", "type_id": 4, "elucidate": "TCG^_CGA", "accession": "NruI", 
-        "query_start": 9, "cut": 11, "query_end": 14, "clockwise": True},
+        "name": "NruI", "type_id": 4, "elucidate": "TCG^_CGA", "label": "NruI", 
+        "query_start": 9, "cut": 11, "query_end": 14, "subject_start": 1, "subject_end": 6},
 
        {"layer": "Restriction Enzymes",
-        "name": "ClaI", "type_id": 4, "elucidate": "AT^CG_AT", "accession": "ClaI",
-        "query_start": 20, "cut": 21, "query_end": 2, "clockwise": True}
+        "name": "ClaI", "type_id": 4, "elucidate": "AT^CG_AT", "label": "ClaI",
+        "query_start": 20, "cut": 21, "query_end": 2, "subject_start": 1, "subject_end": 6},
       ]
     )
 
@@ -190,10 +311,9 @@ class IntegrationTest(TestCase):
        "query_end": 25,
        "subject_start" : 1,
        "subject_end" : 8,
-       "clockwise": True,
        "name": "G2",
        "type_id": 5,
-       "accession": "G2",
+       "label": "G2",
        "alignment": {"query": "MKKKAPSI", "match": "MKKKAPSI", "subject": "MKKKAPSI"},
        "evalue": 5.42133e-5,
        "identities": 8

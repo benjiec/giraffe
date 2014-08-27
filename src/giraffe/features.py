@@ -2,6 +2,7 @@ from Bio.Alphabet import IUPAC, _verify_alphabet
 from Bio.Seq import Seq
 import re
 import os
+from giraffe_features import Giraffe_Feature_Base, Aligned_Feature, Feature_Type_Choices
 
 
 ##################################
@@ -17,140 +18,6 @@ def clean_sequence(sequence, strict=False, alphabet=None):
     if not _verify_alphabet(Seq(sequence.upper(), alphabet)):
       raise Exception("Sequence %s contains illegal character. Expecting %s only." % (sequence, alphabet.letters))
   return sequence
-
-
-
-##################################
-# Feature types
-#
-
-class Constant_Choices:
-
-  @classmethod
-  def choices(cls):
-    choices = []
-    for attr in dir(cls):
-      v = getattr(cls, attr)
-      if type(v) == type((1,2)):
-        choices.append(v)
-    return choices
-
-  @classmethod
-  def by_value(cls, value):
-    for v in cls.choices():
-      if v[0] == value:
-        return v
-    return (None, None)
-
-  @classmethod
-  def by_label(cls, label):
-    for v in cls.choices():
-      if v[1] == label:
-        return v
-    return (None, None)
-
-  @classmethod
-  def str(cls, value_or_tuple):
-    if type(value_or_tuple) == type((1,2)):
-      return value_or_tuple[1]
-    else:
-      return cls.by_value(value_or_tuple)[1]
-
-  @classmethod
-  def value(cls, str_or_tuple):
-    if type(str_or_tuple) == type((1,2)):
-      return str_or_tuple[0]
-    else:
-      return cls.by_label(str_or_tuple)[0]
-
-
-class Feature_Type_Choices(Constant_Choices):
-
-  #
-  # FOLLOWING VALUES MUST MATCH THOSE IN static/giraffe/javascripts/draw.js
-  #
-  FEATURE       = (1,  'Feature')
-  PROMOTER      = (2,  'Promoter')
-  PRIMER        = (3,  'Primer')
-  ENZYME        = (4,  'Restriction Enzyme')
-  GENE          = (5,  'Gene')
-  ORIGIN        = (6,  'Origin')
-  REGULATORY    = (7,  'Regulatory')
-  TERMINATOR    = (8,  'Terminator')
-  CUSTOM        = (9,  'Custom')
-  ORF           = (10, 'Orf')
-  PROTEIN       = (11, 'Protein')
-  CUSTOM2       = (12, 'Custom2')
-  CUSTOM3       = (13, 'Custom3')
-  CUSTOM4       = (14, 'Custom4')
-  #
-  # ABOVE VALUES MUST MATCH THOSE IN static/giraffe/javascripts/draw.js
-  #
-
-  @staticmethod
-  def labels():
-    return [t[1] for t in Feature_Type_Choices.choices()]
-
-
-
-##################################
-# Detected features
-#
-
-class Detected_Feature_Base(object):
-
-  def __init__(self, name, label, start, end, clockwise, type):
-    self.name = name
-    self.label = label
-    self.start = start
-    self.end = end
-    self.clockwise = clockwise
-    self.type = type
-    self.layer = 'Detected Features'
-    if type not in Feature_Type_Choices.labels():
-      raise Exception("Invalid type: %s" % (type,))
-
-  def to_dict(self):
-    t = Feature_Type_Choices.by_label(self.type)
-    return dict(query_start=self.start,
-                query_end=self.end,
-                accession=self.label,
-                name=self.name,
-                clockwise=self.clockwise,
-                layer=self.layer,
-                type_id=t[0])
-
-
-class Aligned_Feature(Detected_Feature_Base):
-
-  def __init__(self, name, label, start, end, clockwise, type,
-               subject_start, subject_end,
-               query, match, subject,
-               feature_id, evalue, identities):
-    super(Aligned_Feature, self).__init__(name, label, start, end, clockwise, type)
-    self.subject_start = subject_start
-    self.subject_end = subject_end
-    self.query = query
-    self.match = match
-    self.subject = subject
-    self.feature_id = feature_id
-    self.evalue = evalue
-    self.identities = identities
-
-  def to_dict(self):
-    r = super(Aligned_Feature, self).to_dict()
-    r['subject_start'] = self.subject_start
-    r['subject_end'] = self.subject_end
-    r['alignment'] = { 'query': self.query, 'match': self.match, 'subject': self.subject }
-    r['evalue'] = self.evalue
-    r['identities'] = self.identities
-    return r
-
-  @property
-  def feature(self):
-    from hippo.models import Feature
-    return Feature.objects.get(pk=self.feature_id)
-
 
 
 ##################################
@@ -282,10 +149,12 @@ def blast(sequence, dbobj, input_type='dna', protein=False,
         if hit_start != 1 or hit_end != accession.feature_length:
           feature = '%s (%s-%s/%s)' % (feature, hit_start, hit_end, accession.feature_length)
 
-        f = Aligned_Feature(feature, alignment.hit_def, start, end, clockwise, accession.type,
-                            hsp.sbjct_start, hsp.sbjct_end,
-                            hsp.query, hsp.match, hsp.sbjct, accession.feature_id,
+        f = Aligned_Feature(alignment.hit_def, feature,
+                            start, end, hsp.sbjct_start, hsp.sbjct_end,
+                            accession.type,
+                            hsp.query, hsp.match, hsp.sbjct,
                             hsp.expect, hsp.identities)
+        setattr(f, 'feature_id', accession.feature_id)
         feature_list.append(f)
 
   os.unlink(outfile)
@@ -295,16 +164,15 @@ def blast(sequence, dbobj, input_type='dna', protein=False,
   filtered = []
   for f in feature_list:
     trumped = False
-    if f.start == 1:
+    if f.query_start == 1:
       # see if this feature is trumped by another one
       for other_f in feature_list:
         # same ending, direction, feature, but other_f is across circular
         # boundary (start > end)
-        if other_f.start != f.start and \
-           other_f.end == f.end and \
-           other_f.clockwise == f.clockwise and \
+        if other_f.query_start != f.query_start and \
+           other_f.query_end == f.query_end and \
            other_f.feature_id == f.feature_id and \
-           other_f.start > other_f.end:
+           other_f.query_start > other_f.query_end:
           trumped = True
           break
     if not trumped:
@@ -322,11 +190,13 @@ from Bio.Restriction import CommOnly, RestrictionBatch
 from Bio.Restriction import *
 
 
-class Restriction_Site(Detected_Feature_Base):
+class Restriction_Site(Giraffe_Feature_Base):
 
   def __init__(self, enzyme, start, end, clockwise, cut):
     name = str(enzyme)
-    super(Restriction_Site, self).__init__(name, name, start, end, clockwise, Feature_Type_Choices.ENZYME[1])
+    super(Restriction_Site, self).__init__(name, name, start, end,
+                                           1, len(enzyme.site),
+                                           Feature_Type_Choices.ENZYME[1], 'Restriction Enzyme')
     self.enzyme = enzyme
     self.cut = cut
     self.layer = 'Restriction Enzymes'

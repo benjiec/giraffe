@@ -1,6 +1,9 @@
 Django >= 1.5
 South >= 0.7.2
 
+# standardize on how we describe features
+git+http://github.com/benjiec/giraffe-features.git#egg=giraffe_features
+
 # ORF detection and reading alignments
 biopython
 

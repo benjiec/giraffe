@@ -1,13 +1,17 @@
 from Bio import SeqIO
-from features import Detected_Feature_Base, Feature_Type_Choices
+from giraffe_features import Giraffe_Feature_Base, Feature_Type_Choices
 import tempfile
 import os
 
 
-class GenbankFeature(Detected_Feature_Base):
-  def __init__(self, name, start, end, clockwise, type):
-    super(GenbankFeature, self).__init__(name, name, start, end, clockwise, type)
-    self.layer = 'GenBank'
+class GenbankFeature(Giraffe_Feature_Base):
+  def __init__(self, name, start, end, strand, type):
+    sbj_start = 1
+    sbj_end = end-start+1
+    if strand != 1:
+      sbj_start = sbj_end
+      sbj_end = 1
+    super(GenbankFeature, self).__init__(name, name, start, end, sbj_start, sbj_end, type, "GenBank")
 
 
 def parse_genbank(input):
@@ -72,10 +76,9 @@ def parse_genbank(input):
       fn = f.type
     
     #print '%s (%s): %s %s %s: %s' % (f.type, ft, f.location.start, f.location.end, f.location.strand, fn)
-    ff = GenbankFeature(fn, int(f.location.start), int(f.location.end), 1 if f.location.strand == 1 else 0, ft)
+    ff = GenbankFeature(fn, int(f.location.start), int(f.location.end), f.location.strand, ft)
     features.append(ff)
 
   os.unlink(infile)
 
   return str(rec.seq), features
-
