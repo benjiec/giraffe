@@ -44,7 +44,10 @@ cd src; python manage.py runserver 0.0.0.0:8000
 
 To test it out, install [giraffe-ui](http://github.com/benjiec/giraffe-ui) and
 point the example ```analyze.html``` and ```draw.html``` files to
-```http://0.0.0.0:8000/giraffe/analyze/```.
+
+```
+http://0.0.0.0:8000/giraffe/analyze/
+```
 
 
 ### API
