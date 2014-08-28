@@ -48,7 +48,7 @@ import tempfile
 import subprocess
 
 def blast(sequence, dbobj, input_type='dna', protein=False,
-          identity_threshold=0.85, evalue_threshold=0.001, feature_threshold=None, circular=True):
+          identity_threshold=0.85, evalue_threshold=0.0001, feature_threshold=None, circular=True):
   """
   Blast sequence against specified feature database. If input type is 'dna',
   using blastn if protein=False (default), or blastx if protein=True. If input
@@ -82,20 +82,20 @@ def blast(sequence, dbobj, input_type='dna', protein=False,
     if input_type == 'dna':
       blast_cl = NcbiblastxCommandline(query=infile, db="%s" % (dbobj.protein_db_name(),),
                                        evalue=evalue_threshold, word_size=3, outfmt=5, out=outfile,
-                                       max_target_seqs=10000)
+                                       max_target_seqs=500)
     else:
       blast_cl = NcbiblastpCommandline(query=infile, db="%s" % (dbobj.protein_db_name(),),
                                        evalue=evalue_threshold, word_size=3, outfmt=5, out=outfile,
-                                       max_target_seqs=10000)
+                                       max_target_seqs=500)
   else:
     if input_type == 'dna':
       blast_cl = NcbiblastnCommandline(query=infile, db="%s" % (dbobj.dna_db_name(),),
                                        evalue=evalue_threshold, word_size=6, outfmt=5, out=outfile,
-                                       max_target_seqs=10000)
+                                       max_target_seqs=500)
     else:
       blast_cl = NcbitblastnCommandline(query=infile, db="%s" % (dbobj.dna_db_name(),),
                                         evalue=evalue_threshold, word_size=6, outfmt=5, out=outfile,
-                                        max_target_seqs=10000)
+                                        max_target_seqs=500)
 
 
   cl = str(blast_cl)
