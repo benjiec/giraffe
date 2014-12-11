@@ -1,10 +1,11 @@
+import json
+import httplib
 from django.http import HttpResponse
 from Bio.Alphabet import IUPAC
+from hippo import clean_sequence
 import features
 import orfs
-import json
 import gb
-import httplib
 
 
 def _post(request):
@@ -31,9 +32,9 @@ def _post(request):
     # clean sequence
     input_type = request.REQUEST.get('input', 'dna')
     if input_type in ['protein']:
-      sequence = features.clean_sequence(sequence, alphabet=IUPAC.protein)
+      sequence = clean_sequence(sequence, alphabet=IUPAC.protein)
     else:
-      sequence = features.clean_sequence(sequence)
+      sequence = clean_sequence(sequence)
 
     feature_list = gb_features
     gbonly = 'gbonly' in request.REQUEST and request.REQUEST['gbonly'] in ['1', 'true', 'True']
@@ -112,8 +113,8 @@ def _blast2(request):
       res = []
 
     else:
-      subject = features.clean_sequence(request.REQUEST['subject'])
-      query = features.clean_sequence(request.REQUEST['query'])
+      subject = clean_sequence(request.REQUEST['subject'])
+      query = clean_sequence(request.REQUEST['query'])
       res = features.blast2(subject, query)
 
     j = json.JSONEncoder().encode(res)

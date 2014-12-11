@@ -1,23 +1,8 @@
-from Bio.Alphabet import IUPAC, _verify_alphabet
-from Bio.Seq import Seq
 import re
 import os
+from Bio.Seq import Seq
 from giraffe_features import Giraffe_Feature_Base, Aligned_Feature, Feature_Type_Choices
-
-
-##################################
-# Sequence cleaning
-#
-
-def clean_sequence(sequence, strict=False, alphabet=None):
-  sequence = sequence.strip()
-  sequence = re.sub(r'\s+', '', sequence)
-  if strict: # throws exception if DNA is not valid
-    if alphabet is None:
-      alphabet = IUPAC.unambiguous_dna
-    if not _verify_alphabet(Seq(sequence.upper(), alphabet)):
-      raise Exception("Sequence %s contains illegal character. Expecting %s only." % (sequence, alphabet.letters))
-  return sequence
+from hippo import clean_sequence, Blast_Accession
 
 
 ##################################
@@ -25,20 +10,6 @@ def clean_sequence(sequence, strict=False, alphabet=None):
 #
 
 from django.conf import settings
-
-class Blast_Accession(object):
-
-  @staticmethod
-  def make(type, feature_id, feature_length):
-    return '%s-%s-%s' % (type, feature_id, feature_length)
-
-  def __init__(self, accession):
-    a = accession.split('-')
-    self.type = a[0]
-    self.feature_id = int(a[1])
-    self.feature_length = int(a[2])
-
-
 from Bio.Blast.Applications import NcbiblastnCommandline
 from Bio.Blast.Applications import NcbiblastpCommandline
 from Bio.Blast.Applications import NcbiblastxCommandline

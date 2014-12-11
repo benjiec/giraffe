@@ -1,7 +1,6 @@
 from django.db import models
 from django.db import utils
 from django.conf import settings
-from giraffe_features import Feature_Type_Choices
 import datetime
 import re
 
@@ -13,10 +12,13 @@ class Feature_Type(models.Model):
     return self.type
 
   def save(self, *args, **kwargs):
+    from giraffe_features import Feature_Type_Choices
+
     if self.type not in Feature_Type_Choices.labels():
       raise Exception("Invalid type: %s, expecting one of %s" % (
                       self.type,
                       ' '.join(Feature_Type_Choices.labels())))
+
     return super(Feature_Type, self).save(*args, **kwargs)
 
   class Meta:
@@ -28,19 +30,21 @@ class Feature(models.Model):
   PROTEIN = 2
 
   type = models.ForeignKey(Feature_Type)
-  name = models.CharField(max_length=32,db_index=True)
+  name = models.CharField(max_length=32, db_index=True)
   sequence = models.TextField()
   dna_or_protein = models.IntegerField('DNA or Protein',
                                        choices=((DNA, 'DNA'), (PROTEIN, 'Protein')), default=DNA)
-  last_modified = models.DateTimeField(auto_now=True,db_index=True)
+  last_modified = models.DateTimeField(auto_now=True, db_index=True)
 
   def save(self, *args, **kwargs):
-    from giraffe.features import clean_sequence
+    from hippo import clean_sequence
     from Bio.Alphabet import IUPAC
+
     if self.is_dna():
       alphabet = IUPAC.unambiguous_dna
     else:
       alphabet = IUPAC.protein
+
     self.sequence = clean_sequence(self.sequence, strict=True, alphabet=alphabet)
     return super(Feature,self).save(*args, **kwargs)
 
@@ -90,7 +94,7 @@ class Feature_Database(models.Model):
   def __build_db(self, dna_or_protein):
     import os, tempfile, subprocess
     from Bio.Alphabet import IUPAC
-    from giraffe.features import clean_sequence, Blast_Accession
+    from hippo import clean_sequence, Blast_Accession
 
     is_dna = False
     infile = None
@@ -130,4 +134,3 @@ class Feature_Database(models.Model):
   def build(self):
     self.__build_db(Feature.DNA)
     self.__build_db(Feature.PROTEIN)
-

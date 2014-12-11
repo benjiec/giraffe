@@ -71,16 +71,18 @@ class BlastTest(TestCase):
  
   def test_blast_feature_threshold(self):
     self.feature_db.build()
+    p = 0.8
+    n = int(len(self.dna)*p)
 
-    query = 'G'*100+self.dna[0:12]+'A'*40
+    query = 'G'*100+self.dna[0:n]+'A'*40
     feature_list = blast(query, self.feature_db, feature_threshold=None)
     self.assertEquals(len(feature_list), 1)
     self.assertEquals(feature_list[0].query_start, 101)
-    self.assertEquals(feature_list[0].query_end, 100+12)
+    self.assertEquals(feature_list[0].query_end, 100+n)
     self.assertEquals(feature_list[0].subject_start, 1)
-    self.assertEquals(feature_list[0].subject_end, 12)
+    self.assertEquals(feature_list[0].subject_end, n)
 
-    feature_list = blast(query, self.feature_db, feature_threshold=0.8)
+    feature_list = blast(query, self.feature_db, feature_threshold=p)
     self.assertEquals(len(feature_list), 0)
  
   def test_get_feature_from_blast_result(self):
