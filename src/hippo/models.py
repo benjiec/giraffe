@@ -71,7 +71,6 @@ class Feature_Database(models.Model):
 
   name = models.CharField(max_length=64,unique=True)
   features = models.ManyToManyField(Feature, blank=True, null=True)
-  last_built = models.DateTimeField(null=True,blank=True)
 
   def __unicode__(self):
     return self.name
@@ -91,7 +90,7 @@ class Feature_Database(models.Model):
   def protein_db_name(self):
     return "%s/%s-%s" % (settings.NCBI_DATA_DIR, self.name, self.protein_db_type())
 
-  def __build_db(self, dna_or_protein):
+  def __build_db(self, dna_or_protein, features):
     import os, tempfile, subprocess
     from Bio.Alphabet import IUPAC
     from hippo import clean_sequence, Blast_Accession
@@ -99,10 +98,17 @@ class Feature_Database(models.Model):
     is_dna = False
     infile = None
     nadded = 0
+      
+    if features is None and self.features.count() == 0:
+      return
+
+    if features is None:
+      features = self.features.all()
 
     with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
       infile = f.name
-      for feature in self.features.all():
+
+      for feature in features:
         if feature.dna_or_protein == dna_or_protein:
           if feature.is_dna():
             is_dna = True
@@ -131,6 +137,6 @@ class Feature_Database(models.Model):
 
     os.unlink(infile)
 
-  def build(self):
-    self.__build_db(Feature.DNA)
-    self.__build_db(Feature.PROTEIN)
+  def build(self, features=None):
+    self.__build_db(Feature.DNA, features)
+    self.__build_db(Feature.PROTEIN, features)
