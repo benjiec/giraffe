@@ -117,12 +117,13 @@ class Feature_Database(models.Model):
             is_dna = False
             alphabet = IUPAC.protein
 
-          data = clean_sequence(feature.sequence, strict=True, alphabet=alphabet)
-          f.write(">gnl|%s|%s %s\n%s\n" % (
-                  self.name,
-                  Blast_Accession.make(type=feature.type.type, feature_id=feature.id, feature_length=len(data)),
-                  feature.name, data))
-          nadded += 1
+          data = clean_sequence(feature.sequence, strict=True, alphabet=alphabet, exception=False)
+          if data is not None:
+            f.write(">gnl|%s|%s %s\n%s\n" % (
+                    self.name,
+                    Blast_Accession.make(type=feature.type.type, feature_id=feature.id, feature_length=len(data)),
+                    feature.name, data))
+            nadded += 1
 
     if nadded > 0:
       outfn = self.dna_db_name() if is_dna else self.protein_db_name()
