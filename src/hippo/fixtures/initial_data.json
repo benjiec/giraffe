@@ -2983,7 +2983,6 @@
     "pk": 1, 
     "model": "hippo.feature_database", 
     "fields": {
-      "last_built": null, 
       "name": "default", 
       "features": [
         1, 
