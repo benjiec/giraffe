@@ -68,7 +68,6 @@ def blast(sequence, dbobj, input_type='dna', protein=False,
                                         evalue=evalue_threshold, word_size=6, outfmt=5, out=outfile,
                                         max_target_seqs=500)
 
-
   cl = str(blast_cl)
   cl = "%s/%s" % (settings.NCBI_BIN_DIR, cl)
   r = subprocess.call(cl.split(" "))
@@ -76,6 +75,13 @@ def blast(sequence, dbobj, input_type='dna', protein=False,
     # blast can fail if blastdb is not there, which can happen if there were no
     # sequences available to build a db
     print "Blast failed: %s" % (cl,)
+
+    try:
+      os.unlink(outfile)
+      os.unlink(infile)
+    except:
+      pass
+
     return []
 
   with open(outfile, "r") as f:
