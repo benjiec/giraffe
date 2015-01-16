@@ -271,7 +271,15 @@ def blast2(subject, query):
   cl = str(blast_cl)
   cl = "%s/%s" % (settings.NCBI_BIN_DIR, cl)
   r = subprocess.call(cl.split(" "))
+
   if r != 0:
+    try:
+      os.unlink(outfile)
+      os.unlink(subject_file)
+      os.unlink(query_file)
+    except:
+      pass
+
     raise Exception("Blast failed: %s" % (cl,))
  
   res = []
