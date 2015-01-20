@@ -51,20 +51,20 @@ def blast(sequence, dbobj, input_type='dna', protein=False,
   outfile = "%s.out.xml" % (infile,)
   if protein:
     if input_type == 'dna':
-      blast_cl = NcbiblastxCommandline(query=infile, db="%s" % (dbobj.protein_db_name(),),
+      blast_cl = NcbiblastxCommandline(query=infile, db="%s" % (dbobj.protein_db_name(),), soft_masking=true,
                                        evalue=evalue_threshold, word_size=3, outfmt=5, out=outfile,
                                        max_target_seqs=500)
     else:
-      blast_cl = NcbiblastpCommandline(query=infile, db="%s" % (dbobj.protein_db_name(),),
+      blast_cl = NcbiblastpCommandline(query=infile, db="%s" % (dbobj.protein_db_name(),), soft_masking=true,
                                        evalue=evalue_threshold, word_size=3, outfmt=5, out=outfile,
                                        max_target_seqs=500)
   else:
     if input_type == 'dna':
-      blast_cl = NcbiblastnCommandline(query=infile, db="%s" % (dbobj.dna_db_name(),),
+      blast_cl = NcbiblastnCommandline(query=infile, db="%s" % (dbobj.dna_db_name(),), soft_masking=true,
                                        evalue=evalue_threshold, word_size=6, outfmt=5, out=outfile,
                                        max_target_seqs=500)
     else:
-      blast_cl = NcbitblastnCommandline(query=infile, db="%s" % (dbobj.dna_db_name(),),
+      blast_cl = NcbitblastnCommandline(query=infile, db="%s" % (dbobj.dna_db_name(),), soft_masking=true,
                                         evalue=evalue_threshold, word_size=6, outfmt=5, out=outfile,
                                         max_target_seqs=500)
 
