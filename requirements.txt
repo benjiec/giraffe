@@ -5,7 +5,7 @@ South >= 0.7.2
 git+http://github.com/benjiec/giraffe-features.git#egg=giraffe_features
 
 # ORF detection and reading alignments
-biopython
+biopython == 1.65
 
 # testing
 django-nose
