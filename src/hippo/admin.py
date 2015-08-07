@@ -22,6 +22,7 @@ class FeatureDatabaseAdmin(admin.ModelAdmin):
     def delete_view(self, request, object_id, extra_context=None):
         raise PermissionDenied
 
-    fields = ('name',)
+    fields = ('name', 'features')
+    filter_horizontal = ('features',)
 
 admin.site.register(models.Feature_Database, FeatureDatabaseAdmin)
