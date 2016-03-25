@@ -8,7 +8,7 @@ import orfs
 import gb
 
 
-def _post(request):
+def _post(params, is_ajax):
     """
     Post a sequence and run the sequence through blast and orf detection.
     Expects: db and sequence
@@ -18,10 +18,10 @@ def _post(request):
     from hippo.models import Feature_Database
 
     is_gb = False
-    db_name = request.REQUEST['db'].strip()
+    db_name = params['db'].strip()
     db = Feature_Database.objects.get(name=db_name)
 
-    sequence = request.REQUEST['sequence']
+    sequence = params['sequence']
     gb_features = []
 
     # parse genbank
@@ -30,24 +30,24 @@ def _post(request):
       sequence, gb_features = gb.parse_genbank(sequence.lstrip())
 
     # clean sequence
-    input_type = request.REQUEST.get('input', 'dna')
+    input_type = params['input'] if 'input' in params else 'dna'
     if input_type in ['protein']:
       sequence = clean_sequence(sequence, alphabet=IUPAC.protein)
     else:
       sequence = clean_sequence(sequence)
 
     feature_list = gb_features
-    gbonly = 'gbonly' in request.REQUEST and request.REQUEST['gbonly'] in ['1', 'true', 'True']
-    blastonly = 'blastonly' in request.REQUEST and request.REQUEST['blastonly'] in ['1', 'true', 'True']
+    gbonly = 'gbonly' in params and params['gbonly'] in ['1', 'true', 'True']
+    blastonly = 'blastonly' in params and params['blastonly'] in ['1', 'true', 'True']
 
     if not is_gb or gbonly is False:
       args = {}
-      if 'identity_threshold' in request.REQUEST:
-        args['identity_threshold'] = float(request.REQUEST['identity_threshold'])
-      if 'feature_threshold' in request.REQUEST:
-        args['feature_threshold'] = float(request.REQUEST['feature_threshold'])
+      if 'identity_threshold' in params:
+        args['identity_threshold'] = float(params['identity_threshold'])
+      if 'feature_threshold' in params:
+        args['feature_threshold'] = float(params['feature_threshold'])
       circular = True
-      if 'circular' in request.REQUEST and request.REQUEST['circular'].strip().lower() in ['false', 0, '0']:
+      if 'circular' in params and str(params['circular']).strip().lower() in ['false', 0, '0']:
         circular = False
 
       # feature detection
@@ -71,8 +71,8 @@ def _post(request):
     res = [len(sequence),res,sequence]
     j = json.JSONEncoder().encode(res)
 
-    if 'jsonp' in request.REQUEST:
-        j = request.REQUEST['jsonp']+'('+j+')'
+    if 'jsonp' in params:
+        j = params['jsonp']+'('+j+')'
         http_res = HttpResponse(j,mimetype="text/javascript",status=httplib.OK)
 
     else:
@@ -80,7 +80,7 @@ def _post(request):
         # case browsers force user to download into a file, and for debugging
         # we want to be able to see the JSON list in browser. looks like most
         # browsers will handle JSON sent back as text/html anyways.
-        if request.is_ajax():
+        if is_ajax:
             http_res = HttpResponse(j,mimetype="application/json",status=httplib.OK)
         else:
             http_res = HttpResponse(j,status=httplib.OK)
@@ -95,32 +95,36 @@ def _post(request):
 
 def post(request):
   try:
-    return _post(request)
+    if 'sequence' in request.REQUEST:
+      params = request.REQUEST
+    else:
+      params = json.loads(request.body)
+    return _post(params, request.is_ajax())
   except Exception as e:
     import traceback, sys
     traceback.print_exc(file=sys.stdout)
     raise(e)
 
 
-def _blast2(request):
+def _blast2(params, is_ajax):
     """
     Post query and subject sequences, returns alignment of the two using blastn.
     Expects: query, subject
     Response: JSON dictionary with subject and query strings
     """
 
-    if (not 'subject' in request.REQUEST) or (not 'query' in request.REQUEST):
+    if (not 'subject' in params) or (not 'query' in params):
       res = []
 
     else:
-      subject = clean_sequence(request.REQUEST['subject'])
-      query = clean_sequence(request.REQUEST['query'])
+      subject = clean_sequence(params['subject'])
+      query = clean_sequence(params['query'])
       res = features.blast2(subject, query)
 
     j = json.JSONEncoder().encode(res)
 
-    if 'jsonp' in request.REQUEST:
-      j = request.REQUEST['jsonp']+'('+j+')'
+    if 'jsonp' in params:
+      j = params['jsonp']+'('+j+')'
       http_res = HttpResponse(j,mimetype="text/javascript",status=httplib.OK)
 
     else:
@@ -128,7 +132,7 @@ def _blast2(request):
       # case browsers force user to download into a file, and for debugging
       # we want to be able to see the JSON list in browser. looks like most
       # browsers will handle JSON sent back as text/html anyways.
-      if request.is_ajax():
+      if is_ajax:
         http_res = HttpResponse(j,mimetype="application/json",status=httplib.OK)
       else:
         http_res = HttpResponse(j,status=httplib.OK)
@@ -141,9 +145,12 @@ def _blast2(request):
  
 
 def blast2(request):
-  return _blast2(request)
   try:
-    return _blast2(request)
+    if 'subject' in request.REQUEST:
+      params = request.REQUEST
+    else:
+      params = json.loads(request.body)
+    return _blast2(params, request.is_ajax())
   except Exception as e:
     print str(e)
     raise(e)
