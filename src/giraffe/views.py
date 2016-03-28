@@ -27,7 +27,11 @@ def _post(params, is_ajax):
     # parse genbank
     if sequence.strip().startswith('LOCUS'):
       is_gb = True
-      sequence, gb_features = gb.parse_genbank(sequence.lstrip())
+      try:
+        sequence, gb_features = gb.parse_genbank(sequence.lstrip())
+      except Exception as e:
+        sequence = ""
+        gb_features = []
 
     # clean sequence
     input_type = params['input'] if 'input' in params else 'dna'
@@ -94,16 +98,11 @@ def _post(params, is_ajax):
  
 
 def post(request):
-  try:
-    if 'sequence' in request.REQUEST:
-      params = request.REQUEST
-    else:
-      params = json.loads(request.body)
-    return _post(params, request.is_ajax())
-  except Exception as e:
-    import traceback, sys
-    traceback.print_exc(file=sys.stdout)
-    raise(e)
+  if 'sequence' in request.REQUEST:
+    params = request.REQUEST
+  else:
+    params = json.loads(request.body)
+  return _post(params, request.is_ajax())
 
 
 def _blast2(params, is_ajax):
