@@ -90,54 +90,64 @@ class Feature_Database(models.Model):
   def protein_db_name(self):
     return "%s/%s-%s" % (settings.NCBI_DATA_DIR, self.name, self.protein_db_type())
 
-  def __build_db(self, dna_or_protein, features):
-    import os, tempfile, subprocess
-    from Bio.Alphabet import IUPAC
+
+  @staticmethod
+  def write_feature(dbname, f, feature):
     from hippo import clean_sequence, Blast_Accession
 
-    is_dna = False
+    if feature.is_dna():
+      alphabet = IUPAC.unambiguous_dna
+    else:
+      alphabet = IUPAC.protein
+    data = clean_sequence(feature.sequence, strict=True, alphabet=alphabet, exception=False)
+    if data is not None:
+      f.write(">gnl|%s|%s %s\n%s\n" % (
+              dbname,
+              Blast_Accession.make(type=feature.type.type, feature_id=feature.id, feature_length=len(data)),
+              feature.name, data))
+      return True
+    return False
+
+
+  def __build_db(self, dna_or_protein, features, filename, is_dna):
+    import os, tempfile, subprocess
+    from Bio.Alphabet import IUPAC
+
+    if filename is None:
+      if features is None and self.features.count() == 0:
+        return
+      if features is None:
+        features = self.features.all()
+
     infile = None
-    nadded = 0
-      
-    if features is None and self.features.count() == 0:
-      return
+    builddb = False
 
-    if features is None:
-      features = self.features.all()
+    if filename is None:
+      with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
+        infile = f.name
+        for feature in features:
+          if feature.dna_or_protein == dna_or_protein:
+            if feature.is_dna():
+              is_dna = True
+            else:
+              is_dna = False
+            if Feature_Database.write_feature(self.name, f, feature):
+              builddb = True
+    else:
+      infile = filename
 
-    with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
-      infile = f.name
+    outfn = self.dna_db_name() if is_dna else self.protein_db_name()
+    dbtype = self.dna_db_type() if is_dna else self.protein_db_type()
+    cmd = "%s/makeblastdb -in %s -out %s -title %s -dbtype %s -parse_seqids -input_type fasta" % (
+          settings.NCBI_BIN_DIR, infile, outfn, self.name, dbtype)
+    r = subprocess.check_output(cmd.split(' '))
+    if 'Adding sequences from FASTA' not in r:
+      print r
 
-      for feature in features:
-        if feature.dna_or_protein == dna_or_protein:
-          if feature.is_dna():
-            is_dna = True
-            alphabet = IUPAC.unambiguous_dna
-          else:
-            is_dna = False
-            alphabet = IUPAC.protein
+    if filename is None:
+      os.unlink(infile)
 
-          data = clean_sequence(feature.sequence, strict=True, alphabet=alphabet, exception=False)
-          if data is not None:
-            f.write(">gnl|%s|%s %s\n%s\n" % (
-                    self.name,
-                    Blast_Accession.make(type=feature.type.type, feature_id=feature.id, feature_length=len(data)),
-                    feature.name, data))
-            nadded += 1
 
-    if nadded > 0:
-      outfn = self.dna_db_name() if is_dna else self.protein_db_name()
-      dbtype = self.dna_db_type() if is_dna else self.protein_db_type()
-
-      cmd = "%s/makeblastdb -in %s -out %s -title %s -dbtype %s -parse_seqids -input_type fasta" % (
-            settings.NCBI_BIN_DIR, infile, outfn, self.name, dbtype)
-
-      r = subprocess.check_output(cmd.split(' '))
-      if 'Adding sequences from FASTA' not in r:
-        print r
-
-    os.unlink(infile)
-
-  def build(self, features=None):
-    self.__build_db(Feature.DNA, features)
-    self.__build_db(Feature.PROTEIN, features)
+  def build(self, features=None, filename=None, is_dna=True):
+    self.__build_db(Feature.DNA, features, filename, is_dna)
+    self.__build_db(Feature.PROTEIN, features, filename, is_dna)
