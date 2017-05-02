@@ -94,6 +94,7 @@ class Feature_Database(models.Model):
   @staticmethod
   def write_feature(dbname, f, feature):
     from hippo import clean_sequence, Blast_Accession
+    from Bio.Alphabet import IUPAC
 
     if feature.is_dna():
       alphabet = IUPAC.unambiguous_dna
@@ -111,7 +112,6 @@ class Feature_Database(models.Model):
 
   def __build_db(self, dna_or_protein, features, filename, is_dna):
     import os, tempfile, subprocess
-    from Bio.Alphabet import IUPAC
 
     if filename is None:
       if features is None and self.features.count() == 0:
