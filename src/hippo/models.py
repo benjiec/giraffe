@@ -136,6 +136,11 @@ class Feature_Database(models.Model):
     else:
       infile = filename
 
+    if builddb is False:
+      if filename is None:
+        os.unlink(infile)
+      return
+
     outfn = self.dna_db_name() if is_dna else self.protein_db_name()
     dbtype = self.dna_db_type() if is_dna else self.protein_db_type()
     cmd = "%s/makeblastdb -in %s -out %s -title %s -dbtype %s -parse_seqids -input_type fasta" % (
