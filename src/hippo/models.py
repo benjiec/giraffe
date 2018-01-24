@@ -90,9 +90,8 @@ class Feature_Database(models.Model):
   def protein_db_name(self):
     return "%s/%s-%s" % (settings.NCBI_DATA_DIR, self.name, self.protein_db_type())
 
-
   @staticmethod
-  def write_feature(dbname, f, feature):
+  def make_feature(dbname, feature):
     from hippo import clean_sequence, Blast_Accession
     from Bio.Alphabet import IUPAC
 
@@ -102,13 +101,19 @@ class Feature_Database(models.Model):
       alphabet = IUPAC.protein
     data = clean_sequence(feature.sequence, strict=True, alphabet=alphabet, exception=False)
     if data is not None:
-      f.write(">gnl|%s|%s %s\n%s\n" % (
-              dbname,
-              Blast_Accession.make(type=feature.type.type, feature_id=feature.id, feature_length=len(data)),
-              feature.name, data))
+      return ">gnl|%s|%s %s\n%s\n" % (
+        dbname,
+        Blast_Accession.make(type=feature.type.type, feature_id=feature.id, feature_length=len(data)),
+        feature.name, data)
+    return None
+
+  @staticmethod
+  def write_feature(dbname, f, feature):
+    s = Feature_Database.make_feature(dbname, feature)
+    if s:
+      f.write(s)
       return True
     return False
-
 
   def __build_db(self, dna_or_protein, features, filename, is_dna):
     import os, tempfile, subprocess
