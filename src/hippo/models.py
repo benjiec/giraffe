@@ -135,6 +135,7 @@ class Feature_Database(models.Model):
               builddb = True
     else:
       infile = filename
+      builddb = True
 
     if builddb is False:
       if filename is None:
