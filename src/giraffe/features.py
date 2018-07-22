@@ -19,7 +19,7 @@ import tempfile
 import subprocess
 
 def blast(sequence, dbobj, input_type='dna', protein=False,
-          identity_threshold=0.85, evalue_threshold=0.0001, feature_threshold=None, circular=True):
+          identity_threshold=0.85, evalue_threshold=0.1, feature_threshold=None, circular=True):
   """
   Blast sequence against specified feature database. If input type is 'dna',
   using blastn if protein=False (default), or blastx if protein=True. If input
@@ -29,7 +29,7 @@ def blast(sequence, dbobj, input_type='dna', protein=False,
   threshold. Can be None. Default is 0.85.
 
   evalue_threshold: only return results with evalue smaller than this
-  threshold. Default is 0.001.
+  threshold. Default is 0.1.
 
   feature_threshold: only return results that span at least this amount of a
   feature. Can be None (default). E.g. if set to 0.99, only results spanning an
@@ -262,7 +262,7 @@ def blast2(subject, query):
 
   outfile = "%s.out.xml" % (query_file,)
   blast_cl = NcbiblastnCommandline(query=query_file, subject=subject_file,
-                                   evalue=0.001, word_size=6,
+                                   evalue=0.1, word_size=6,
                                    # these params were tested to allow gaps in
                                    # alignments. i.e. large number of bps
                                    # misaligned or gapped.
