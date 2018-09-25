@@ -185,7 +185,7 @@ class Restriction_Site(Giraffe_Feature_Base):
     return r
 
 
-_MyEnzymes = [AatII, AflII, AgeI, ApaI, ApaLI, AscI, AseI,
+_MyEnzymes = [AarI, AatII, AflII, AgeI, ApaI, ApaLI, AscI, AseI,
               BamHI, BclI, BglII, BstBI, ClaI, DraI, EagI, EarI,
               EcoRI, EcoRV, FspI, HindIII, HpaI, KpnI, MscI,
               NarI, NcoI, NdeI, NheI, NotI, NruI, PacI,
