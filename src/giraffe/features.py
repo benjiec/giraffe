@@ -45,7 +45,7 @@ def blast(sequence, dbobj, input_type='dna', protein=False,
     input2 = input
 
   with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
-    infile = f.name 
+    infile = f.name
     f.write(">Query\n%s\n" % (input2,))
 
   outfile = "%s.out.xml" % (infile,)
@@ -236,7 +236,7 @@ def find_restriction_sites(sequence, circular=True):
             cutter_list.append(f)
             # print 'found %s' % (f.to_dict(),)
         else:
-          raise Exception('Cannot find reported cut site %s %s %s %s' % (enzyme, cut, cut_off, pattern)) 
+          raise Exception('Cannot find reported cut site %s %s %s %s' % (enzyme, cut, cut_off, pattern))
 
   return cutter_list
 
@@ -251,12 +251,12 @@ def blast2(subject, query):
   query = clean_sequence(query)
 
   with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
-    subject_file = f.name 
+    subject_file = f.name
     f.write(">Subject\n%s\n" % (subject,))
     #print 'subject=%s' % (subject,)
 
   with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
-    query_file = f.name 
+    query_file = f.name
     f.write(">Query\n%s\n" % (query,))
     #print 'query=%s' % (query,)
 
@@ -281,9 +281,9 @@ def blast2(subject, query):
       pass
 
     raise Exception("Blast failed: %s" % (cl,))
- 
+
   res = []
- 
+
   with open(outfile, "r") as f:
     blast_record = NCBIXML.read(f)
     for alignment in blast_record.alignments:
