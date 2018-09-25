@@ -197,6 +197,8 @@ _MyEnzymes = [
   BamHI,
   BclI,
   BglII,
+  BsaI,
+  BsmBI,
   BstBI,
   ClaI,
   DraI,
